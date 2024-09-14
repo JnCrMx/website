@@ -30,7 +30,7 @@ auto page() {
         details{
             summary{"Licenses"},
             details{
-                summary{a{{_href{"https://github.com/rthrfrd/webxx"}}, code{"webxx"}}},
+                summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
                 pre{webxx_license_view},
             },
         },
