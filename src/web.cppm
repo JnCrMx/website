@@ -11,7 +11,7 @@ namespace web {
     [[clang::import_name("eval")]] void eval(const char*, size_t);
     [[clang::import_name("set_html")]] void set_html(const char*, size_t, const char*, size_t);
     [[clang::import_name("log")]] void log(const char*, size_t);
-    [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*);
+    [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*, bool);
     [[clang::import_name("set_timeout")]] void set_timeout(unsigned long, void*);
 
     export void eval(std::string_view code) {
@@ -47,9 +47,9 @@ namespace web {
         bool once = false;
     };
 
-    export void add_event_listener(std::string_view id, std::string_view event, event_callback callback) {
-        callback_data* data = new callback_data{callback};
-        add_event_listener(id.data(), id.size(), event.data(), event.size(), data);
+    export void add_event_listener(std::string_view id, std::string_view event, event_callback callback, bool once = false) {
+        callback_data* data = new callback_data{callback, once};
+        add_event_listener(id.data(), id.size(), event.data(), event.size(), data, once);
     }
 
     export void set_timeout(std::chrono::milliseconds duration, event_callback callback) {

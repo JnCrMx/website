@@ -6,13 +6,22 @@ import web_coro;
 
 #include "webxx.h"
 
+constexpr char this_file[] = {
+#embed __FILE__
+};
+constexpr std::string_view this_file_view{this_file, sizeof(this_file)};
+
 auto page() {
     using namespace Webxx;
 
     return fragment{
         h1{"Hello ", i{"world!"}},
         button{{_id{"test"}}, "Click me!"},
-        h2{{_id{"counter"}}, "counter = 0"},
+        h2{{_id{"counter"}}, "Coroutine counter = 0"},
+        p{
+            h2{"This is the source code of this page:"},
+            pre{this_file_view},
+        },
     };
 }
 
@@ -31,8 +40,9 @@ int main() {
 
     using namespace web::coro;
     submit([]()->coroutine<void> {
+        co_await event{"test", "click"};
         for(int i=0; i<100; i++) {
-            web::set_html("counter", "counter = {}", i);
+            web::set_html("counter", "Coroutine counter = {}", i);
             co_await timeout(std::chrono::milliseconds(100));
         }
         co_return;

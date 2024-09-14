@@ -27,12 +27,12 @@
                     log: (ptr, len) => {
                         console.log(get_string(instance, ptr, len));
                     },
-                    add_event_listener: (id_ptr, id_len, event_ptr, event_len, ptr) => {
+                    add_event_listener: (id_ptr, id_len, event_ptr, event_len, ptr, once) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const event = get_string(instance, event_ptr, event_len);
                         document.getElementById(id).addEventListener(event, () => {
                             instance.exports.callback(ptr, event);
-                        });
+                        }, { once: once });
                     },
                     set_timeout: (ms, ptr) => {
                         setTimeout(() => {

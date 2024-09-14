@@ -16,13 +16,19 @@ steps:
       - apt-get update
       - >-
         DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
+        wget lsb-release wget software-properties-common gnupg
+      - wget https://apt.llvm.org/llvm.sh
+      - chmod +x llvm.sh
+      - ./llvm.sh 19
+      - >-
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
         cmake git ca-certificates ninja-build
-        clang-17 clang-tools-17 lld-17 wabt
-        libc++-17-dev-wasm32 libclang-rt-17-dev-wasm32
+        clang-19 clang-tools-19 lld-19 wabt
+        libc++-19-dev-wasm32 libclang-rt-19-dev-wasm32
       - mkdir build
       - >-
         cmake -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel
-        -DCMAKE_C_COMPILER=clang-17 -DCMAKE_CXX_COMPILER=clang++-17
+        -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
       - mkdir -p build/public

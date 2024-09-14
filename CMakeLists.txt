@@ -28,7 +28,7 @@ FetchContent_MakeAvailable(webxx)
 
 add_executable(website src/main.cpp src/c++support.cpp)
 target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES src/web.cppm src/web_coro.cppm)
-target_compile_features(website PRIVATE cxx_std_23)
+target_compile_features(website PRIVATE cxx_std_26)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
 target_link_libraries(website PRIVATE webxx::webxx)

@@ -106,4 +106,22 @@ export struct timeout {
     void await_resume() const noexcept {}
 };
 
+export struct event {
+    std::string_view id;
+    std::string_view event_type;
+    std::coroutine_handle<> handle;
+
+    event(std::string_view id, std::string_view event_type) : id(id), event_type(event_type) {}
+
+    bool await_ready() const noexcept { return false; }
+    bool await_suspend(std::coroutine_handle<promise<void>> handle) noexcept {
+        this->handle = handle;
+        web::add_event_listener(id, event_type, [handle]() {
+            handle.resume();
+        }, true);
+        return true;
+    }
+    void await_resume() const noexcept {}
+};
+
 }
