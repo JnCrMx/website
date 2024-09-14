@@ -18,8 +18,8 @@ auto page() {
         h1{"Hello ", i{"world!"}},
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
-        p{
-            h2{"This is the source code of this page:"},
+        details{
+            summary{"Source Code"},
             pre{this_file_view},
         },
     };
