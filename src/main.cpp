@@ -24,7 +24,7 @@ auto page() {
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
         details{
-            summary{"Source Code (" __FILE__ ")"},
+            summary{a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Source Code"}},
             pre{this_file_view},
         },
         details{
