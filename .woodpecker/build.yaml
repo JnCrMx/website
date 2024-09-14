@@ -1,3 +1,14 @@
+variables:
+  - &minio-settings
+    access_key:
+      from_secret: minio_access_key
+    secret_key:
+      from_secret: minio_secret_key
+    endpoint:
+      from_secret: minio_endpoint
+    path_style: true
+    region: eu-central-jcm
+
 steps:
   build:
     image: ubuntu:noble
@@ -14,3 +25,30 @@ steps:
         -DCMAKE_C_COMPILER=clang-17 -DCMAKE_CXX_COMPILER=clang++-17
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
+      - mkdir -p build/public
+      - cp build/website.wasm build/public/
+      - cp index.html build/public/
+  upload-logs:
+    image: woodpeckerci/plugin-s3
+    settings:
+      <<: *minio-settings
+      bucket: woodpecker
+      source: build/cmake-*.log
+      strip_prefix: build/
+      target: /artifacts/${CI_REPO}/${CI_PIPELINE_NUMBER}/public/
+    when:
+      - status: [ success, failure ]
+  upload-website:
+    image: appleboy/drone-scp
+    settings:
+      host:
+        from_secret: ssh_host
+      username:
+        from_secret: ssh_user
+      key:
+        from_secret: ssh_key
+      port:
+        from_secret: ssh_port
+      target: /config/data/website
+      source: build/public/
+      strip_components: 2

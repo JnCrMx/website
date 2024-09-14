@@ -57,7 +57,7 @@
             };
 
             const { instance } = await WebAssembly.instantiateStreaming(
-                fetch("./build/website.wasm"), importObject
+                fetch("./website.wasm"), importObject
             );
             instance.exports._initialize();
             instance.exports.main();
