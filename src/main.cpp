@@ -11,6 +11,11 @@ constexpr char this_file[] = {
 };
 constexpr std::string_view this_file_view{this_file, sizeof(this_file)};
 
+constexpr char webxx_license[] = {
+#embed "../build/_deps/webxx-src/LICENSE.md"
+};
+constexpr std::string_view webxx_license_view{webxx_license, sizeof(webxx_license)};
+
 auto page() {
     using namespace Webxx;
 
@@ -19,8 +24,15 @@ auto page() {
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
         details{
-            summary{"Source Code"},
+            summary{"Source Code (" __FILE__ ")"},
             pre{this_file_view},
+        },
+        details{
+            summary{"Licenses"},
+            details{
+                summary{"webxx"},
+                pre{webxx_license_view},
+            },
         },
     };
 }
