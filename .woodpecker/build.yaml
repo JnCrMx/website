@@ -15,11 +15,10 @@ steps:
     commands:
       - apt-get update
       - >-
-        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
-        wget lsb-release wget software-properties-common gnupg
-      - wget https://apt.llvm.org/llvm.sh
-      - chmod +x llvm.sh
-      - ./llvm.sh 19
+        DEBIAN_FRONTEND=noninteractive apt-get install -y curl
+      - curl https://apt.llvm.org/llvm-snapshot.gpg.key -o /etc/apt/trusted.gpg.d/llvm-snapshot.gpg.key
+      - echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" > /etc/apt/sources.list.d/llvm.list
+      - apt-get update
       - >-
         DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
         cmake git ca-certificates ninja-build
