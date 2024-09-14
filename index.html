@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCM's website</title>
+</head>
+
+<body>
+    <script type="module">
+        function get_string(instance, ptr, len) {
+            const cArray = new Uint8Array(instance.exports.memory.buffer, ptr, len);
+            return new TextDecoder().decode(cArray);
+        }
+
+        async function init() {
+            const importObject = {
+                env: {
+                    eval: (ptr, len) => {
+                        eval(get_string(instance, ptr, len));
+                    },
+                    set_html: (id_ptr, id_len, html_ptr, html_len) => {
+                        const id = get_string(instance, id_ptr, id_len);
+                        document.getElementById(id).innerHTML = get_string(instance, html_ptr, html_len);
+                    },
+                    log: (ptr, len) => {
+                        console.log(get_string(instance, ptr, len));
+                    },
+                    add_event_listener: (id_ptr, id_len, event_ptr, event_len, ptr) => {
+                        const id = get_string(instance, id_ptr, id_len);
+                        const event = get_string(instance, event_ptr, event_len);
+                        document.getElementById(id).addEventListener(event, () => {
+                            instance.exports.callback(ptr, event);
+                        });
+                    },
+                    set_timeout: (ms, ptr) => {
+                        setTimeout(() => {
+                            instance.exports.callback(ptr);
+                        }, ms);
+                    },
+                },
+                wasi_snapshot_preview1: {
+                    fd_close: () => { console.log("fd_close"); },
+                    fd_seek: () => { console.log("fd_seek"); },
+                    fd_write: () => { console.log("fd_write"); },
+                    environ_get: () => { console.log("environ_get"); },
+                    environ_sizes_get: () => { console.log("environ_sizes_get"); },
+                    proc_exit: () => { console.log("proc_exit"); },
+                    random_get(buf, buf_len) {
+                        const data = new Uint8Array(instance.exports.memory.buffer, buf, buf_len);
+                        for (let i = 0; i < buf_len; ++i) {
+                            data[i] = (Math.random() * 256) | 0;
+                        }
+                    }
+                }
+            };
+
+            const { instance } = await WebAssembly.instantiateStreaming(
+                fetch("./build/website.wasm"), importObject
+            );
+            instance.exports._initialize();
+            instance.exports.main();
+        }
+        init();
+    </script>
+    <main id="main">
+
+    </main>
+</body>
+
+</html>
