@@ -16,6 +16,19 @@ constexpr char webxx_license[] = {
 };
 constexpr std::string_view webxx_license_view{webxx_license, sizeof(webxx_license)};
 
+#ifdef __clang__
+constexpr auto cxx_compiler_name = "clang++";
+constexpr auto cxx_compiler_version_major = __clang_major__;
+constexpr auto cxx_compiler_version_minor = __clang_minor__;
+constexpr auto cxx_compiler_version_patch = __clang_patchlevel__;
+#else
+constexpr auto cxx_compiler_name = "g++";
+constexpr auto cxx_compiler_version_major = __GNUC__;
+constexpr auto cxx_compiler_version_minor = __GNUC_MINOR__;
+constexpr auto cxx_compiler_version_patch = __GNUC_PATCHLEVEL__;
+#endif
+
+
 auto page() {
     using namespace Webxx;
 
@@ -35,6 +48,13 @@ auto page() {
                     pre{webxx_license_view},
                 }},
             },
+        },
+        p{
+            std::format(
+                "Built on {} at {} with {} version {}.{}.{}.",
+                __DATE__, __TIME__, cxx_compiler_name,
+                cxx_compiler_version_major, cxx_compiler_version_minor, cxx_compiler_version_patch
+            )
         },
     };
 }
