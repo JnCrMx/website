@@ -1,6 +1,4 @@
 body{
-    margin: 40px auto;
-    max-width: 750px;
     line-height: 1.6;
     font-size: 18px;
     color: #444;
@@ -35,4 +33,52 @@ dt {
     margin-top: 0;
     list-style-type: none;
     padding-left: 1rem;
+}
+
+.window {
+    border: 1px solid #444;
+    border-radius: 9px;
+    padding: 0px;
+    margin: 10px;
+
+    position: absolute;
+    background-color: #FFF;
+}
+.window.grabbed {
+    cursor: move;
+    user-select: none;
+}
+.window .titlebar {
+    margin: 10px;
+    display: flex;
+}
+.window:not(.grabbed) .titlebar {
+    cursor: default;
+}
+.window .titlebar h3 {
+    margin: 0;
+    margin-right: 3em;
+    flex-grow: 1;
+}
+.window .titlebar button {
+    border-radius: 50%;
+    border: 1px solid #444;
+    width: 2em;
+    height: 2em;
+    margin-top: auto;
+    margin-bottom: auto;
+    background-color: #EEE;
+    margin-left: 0.5em;
+}
+.window .titlebar button:hover {
+    background-color: #DDD;
+}
+.window .titlebar .close {
+    background-color: #F88;
+}
+.window .titlebar .close:hover {
+    background-color: #F44;
+}
+.window .content {
+    margin: 10px;
 }

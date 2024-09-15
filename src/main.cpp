@@ -28,14 +28,32 @@ constexpr auto cxx_compiler_version_minor = __GNUC_MINOR__;
 constexpr auto cxx_compiler_version_patch = __GNUC_PATCHLEVEL__;
 #endif
 
-
 auto page() {
     using namespace Webxx;
+
+    struct Window : component<Window> {
+        Window(std::string_view id, std::string_view title) : component<Window>{
+            dv { {_id{id}, _class{"window"}},
+                dv { {_class{"titlebar"}},
+                    h3 {title},
+                    button { {_class{"minimize"}},"_"},
+                    button { {_class{"maximize"}},"□"},
+                    button { {_class{"close"}},"×"},
+                },
+                hr{},
+                dv { {_class{"content"}},
+                    "Hello World!",
+                }
+            }
+        } {}
+    };
 
     return fragment{
         h1{"Hello from JCM!"},
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
+        Window{"source_code", "Source Code"},
+        Window{"licenses", "Licenses"},
         details{
             summary{a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Source Code"}},
             pre{this_file_view},
@@ -58,6 +76,9 @@ auto page() {
         },
     };
 }
+void move_window(std::string_view id, int x, int y) {
+    web::set_property(id, "style", "left: {}px; top: {}px;", x, y);
+}
 
 [[clang::export_name("main")]]
 int main() {
@@ -71,6 +92,9 @@ int main() {
             });
         }
     });
+
+    move_window("source_code", 300, 500);
+    move_window("licenses", 700, 300);
 
     using namespace web::coro;
     submit([]()->coroutine<void> {

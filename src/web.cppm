@@ -10,6 +10,7 @@ export module web;
 namespace web {
     [[clang::import_name("eval")]] void eval(const char*, size_t);
     [[clang::import_name("set_html")]] void set_html(const char*, size_t, const char*, size_t);
+    [[clang::import_name("set_property")]] void set_property(const char*, size_t, const char*, size_t, const char*, size_t);
     [[clang::import_name("log")]] void log(const char*, size_t);
     [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*, bool);
     [[clang::import_name("set_timeout")]] void set_timeout(unsigned long, void*);
@@ -30,6 +31,15 @@ namespace web {
     void set_html(std::string_view id, std::format_string<Args...> html, Args&&... args) {
         std::string s = std::format(html, std::forward<Args>(args)...);
         set_html(id.data(), id.size(), s.data(), s.size());
+    }
+
+    export void set_property(std::string_view id, std::string_view property, std::string_view value) {
+        set_property(id.data(), id.size(), property.data(), property.size(), value.data(), value.size());
+    }
+    export template<class... Args>
+    void set_property(std::string_view id, std::string_view property, std::format_string<Args...> value, Args&&... args) {
+        std::string s = std::format(value, std::forward<Args>(args)...);
+        set_property(id.data(), id.size(), property.data(), property.size(), s.data(), s.size());
     }
 
     void log(std::string_view message) {

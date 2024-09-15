@@ -25,6 +25,12 @@
                         const id = get_string(instance, id_ptr, id_len);
                         document.getElementById(id).innerHTML = get_string(instance, html_ptr, html_len);
                     },
+                    set_property: (id_ptr, id_len, property_ptr, property_len, value_ptr, value_len) => {
+                        const id = get_string(instance, id_ptr, id_len);
+                        const property = get_string(instance, property_ptr, property_len);
+                        const value = get_string(instance, value_ptr, value_len);
+                        document.getElementById(id)[property] = value;
+                    },
                     log: (ptr, len) => {
                         console.log(get_string(instance, ptr, len));
                     },
