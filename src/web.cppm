@@ -11,9 +11,29 @@ namespace web {
     [[clang::import_name("eval")]] void eval(const char*, size_t);
     [[clang::import_name("set_html")]] void set_html(const char*, size_t, const char*, size_t);
     [[clang::import_name("set_property")]] void set_property(const char*, size_t, const char*, size_t, const char*, size_t);
+    [[clang::import_name("get_property")]] char* get_property(const char*, size_t, const char*, size_t);
     [[clang::import_name("log")]] void log(const char*, size_t);
     [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*, bool);
     [[clang::import_name("set_timeout")]] void set_timeout(unsigned long, void*);
+
+    [[clang::export_name("new_string")]]
+    char* new_string(size_t len) {
+        return new char[len];
+    }
+
+    [[clang::export_name("delete_string")]]
+    void delete_string(char* ptr) {
+        delete[] ptr;
+    }
+
+    void log(std::string_view message) {
+        log(message.data(), message.size());
+    }
+    export template<class... Args>
+    void log(std::format_string<Args...> fmt, Args&&... args) {
+        std::string s = std::format(fmt, std::forward<Args>(args)...);
+        log(s.data(), s.size());
+    }
 
     export void eval(std::string_view code) {
         eval(code.data(), code.size());
@@ -42,16 +62,17 @@ namespace web {
         set_property(id.data(), id.size(), property.data(), property.size(), s.data(), s.size());
     }
 
-    void log(std::string_view message) {
-        log(message.data(), message.size());
+    export std::string get_property(std::string_view id, std::string_view property) {
+        char* ptr = get_property(id.data(), id.size(), property.data(), property.size());
+        std::string s{ptr};
+        delete_string(ptr);
+        return s;
     }
-    export template<class... Args>
-    void log(std::format_string<Args...> fmt, Args&&... args) {
-        std::string s = std::format(fmt, std::forward<Args>(args)...);
-        log(s.data(), s.size());
+    export int get_property_int(std::string_view id, std::string_view property) {
+        return std::stoi(get_property(id, property));
     }
 
-    using event_callback = std::function<void()>;
+    using event_callback = std::function<void(std::string_view)>;
     struct callback_data {
         event_callback callback;
         bool once = false;
@@ -68,11 +89,11 @@ namespace web {
     }
 
     [[clang::export_name("callback")]]
-    void callback(void* ptr) {
-        callback_data* data = static_cast<callback_data*>(ptr);
-        data->callback();
-        if(data->once) {
-            delete data;
+    void callback(void* ptr, char* data, size_t len) {
+        callback_data* cb = static_cast<callback_data*>(ptr);
+        cb->callback(data ? std::string_view{data, len} : std::string_view{});
+        if(cb->once) {
+            delete cb;
         }
     }
 }

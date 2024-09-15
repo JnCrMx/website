@@ -2,6 +2,7 @@ module;
 
 #include <coroutine>
 #include <chrono>
+#include <string_view>
 
 export module web_coro;
 
@@ -98,7 +99,7 @@ export struct timeout {
     bool await_ready() const noexcept { return false; }
     bool await_suspend(std::coroutine_handle<promise<void>> handle) noexcept {
         this->handle = handle;
-        web::set_timeout(duration, [handle]() {
+        web::set_timeout(duration, [handle](std::string_view) {
             handle.resume();
         });
         return true;
@@ -111,17 +112,24 @@ export struct event {
     std::string_view event_type;
     std::coroutine_handle<> handle;
 
+    std::string data{};
+
     event(std::string_view id, std::string_view event_type) : id(id), event_type(event_type) {}
 
     bool await_ready() const noexcept { return false; }
     bool await_suspend(std::coroutine_handle<promise<void>> handle) noexcept {
         this->handle = handle;
-        web::add_event_listener(id, event_type, [handle]() {
-            handle.resume();
+        web::add_event_listener(id, event_type, [this](std::string_view data) {
+            if(data.size()) {
+                this->data = data;
+            }
+            this->handle.resume();
         }, true);
         return true;
     }
-    void await_resume() const noexcept {}
+    std::string await_resume() const noexcept {
+        return data;
+    }
 };
 
 }

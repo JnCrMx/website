@@ -24,11 +24,12 @@ FetchContent_Declare(webxx
     GIT_REPOSITORY https://github.com/rthrfrd/webxx.git
     GIT_TAG v0.9.2
 )
-FetchContent_MakeAvailable(webxx)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(webxx json)
 
 add_executable(website src/main.cpp src/c++support.cpp)
 target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES src/web.cppm src/web_coro.cppm)
 target_compile_features(website PRIVATE cxx_std_23)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
-target_link_libraries(website PRIVATE webxx::webxx)
+target_link_libraries(website PRIVATE webxx::webxx nlohmann_json::nlohmann_json)
