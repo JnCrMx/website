@@ -96,4 +96,5 @@ ul.licenses {
 .window .content {
     margin: 10px;
     overflow: scroll;
+    padding-right: 1rem;
 }
