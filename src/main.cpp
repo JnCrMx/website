@@ -44,7 +44,7 @@ auto page() {
     using namespace Webxx;
 
     struct Window : component<Window> {
-        Window(std::string_view id, std::string_view title) : component<Window>{
+        Window(std::string_view id, std::string_view title, fragment&& content) : component<Window>{
             dv { {_id{id}, _class{"window"}},
                 dv { {_class{"titlebar"}},
                     h3 {title},
@@ -54,7 +54,7 @@ auto page() {
                 },
                 hr{},
                 dv { {_class{"content"}},
-                    "Hello World!",
+                    std::move(content)
                 }
             }
         } {}
@@ -64,19 +64,14 @@ auto page() {
         h1{"Hello from JCM!"},
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
-        Window{"source_code", "Source Code"},
-        Window{"licenses", "Licenses"},
-        details {
-            summary{"A JS Event"},
-            pre{{_id{"event_test"}}},
-        },
-        details{
-            summary{a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Source Code"}},
-            pre{this_file_view},
-        },
-        details{{_class{"licenses"}},
-            summary{"Licenses"},
-            ul{
+        Window{"source_code", "Source Code", fragment{
+            details{
+                summary{a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, __FILE__}},
+                pre{this_file_view},
+            },
+        }},
+        Window{"licenses", "Licenses", fragment{
+            ul{ {_class{"licenses"}},
                 li{details{
                     summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
                     pre{webxx_license_view},
@@ -86,13 +81,17 @@ auto page() {
                     pre{json_license_view},
                 }},
             },
-        },
-        p{
+        }},
+        Window{"build_info", "Build Info", fragment{
             std::format(
                 "Built on {} at {} with {} version {}.{}.{}.",
                 __DATE__, __TIME__, cxx_compiler_name,
                 cxx_compiler_version_major, cxx_compiler_version_minor, cxx_compiler_version_patch
             )
+        }},
+        details {
+            summary{"A JS Event"},
+            pre{{_id{"event_test"}}},
         },
     };
 }
@@ -120,7 +119,7 @@ int main() {
         }
     });
 
-    for(const auto& window : {"source_code", "licenses"}){
+    for(const auto& window : {"source_code", "licenses", "build_info"}) {
         web::add_event_listener(window, "mousedown", [w = std::string{window}](std::string_view j) {
             nlohmann::json json = nlohmann::json::parse(j);
             int offsetLeft = web::get_property_int(w, "offsetLeft");
@@ -143,8 +142,9 @@ int main() {
         move_window(grabbed_window, x, y);
     });
 
-    move_window("source_code", 300, 100);
+    move_window("source_code", 300, 200);
     move_window("licenses", 700, 300);
+    move_window("build_info", 20, 400);
 
     using namespace web::coro;
     submit([]()->coroutine<void> {

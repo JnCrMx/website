@@ -29,7 +29,7 @@ dt {
     font-weight: bold;
 }
 
-.licenses > ul {
+ul.licenses {
     margin-top: 0;
     list-style-type: none;
     padding-left: 1rem;
@@ -43,6 +43,17 @@ dt {
 
     position: absolute;
     background-color: #FFF;
+
+    max-width: 75%;
+    max-height: 75%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.window hr {
+    margin: 0;
+    flex-grow: 1;
+    width: 100%;
 }
 .window.grabbed {
     cursor: move;
@@ -81,4 +92,5 @@ dt {
 }
 .window .content {
     margin: 10px;
+    overflow: scroll;
 }
