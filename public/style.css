@@ -1,0 +1,38 @@
+body{
+    margin: 40px auto;
+    max-width: 750px;
+    line-height: 1.6;
+    font-size: 18px;
+    color: #444;
+    background-color: #EEE;
+    padding: 0 10px;
+    font-family: sans-serif;
+}
+h1, h2, h3 {
+    line-height:1.2;
+}
+h1 {
+    text-align: center;
+}
+code {
+    border-radius: 9px;
+    background-color: #DDD;
+    padding: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+pre {
+    border-radius: 9px;
+    background-color: #DDD;
+    padding: 10px;
+    overflow-x: auto;
+}
+dt {
+    font-weight: bold;
+}
+
+.licenses > ul {
+    margin-top: 0;
+    list-style-type: none;
+    padding-left: 1rem;
+}

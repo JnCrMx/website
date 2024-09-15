@@ -27,11 +27,13 @@ auto page() {
             summary{a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Source Code"}},
             pre{this_file_view},
         },
-        details{
+        details{{_class{"licenses"}},
             summary{"Licenses"},
-            details{
-                summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
-                pre{webxx_license_view},
+            ul{
+                li{details{
+                    summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
+                    pre{webxx_license_view},
+                }},
             },
         },
     };
