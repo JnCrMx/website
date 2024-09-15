@@ -68,7 +68,7 @@ auto page() {
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
         Window{"source_code", "Source Code", fragment{
-            a{{_href{"https://git.jcm.re/jcm/website"}, _style{"display: flex; align-items: center;"}}, img{{_src{"https://git.jcm.re/assets/img/logo.svg"}}}, b{"GitHug"}},
+            a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}, _style{"display: flex; align-items: center;"}}, img{{_src{"https://git.jcm.re/assets/img/logo.svg"}}}, b{"GitHug"}},
             details{
                 summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
                 pre{files::views::src_main},
