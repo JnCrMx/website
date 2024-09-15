@@ -60,7 +60,8 @@ ul.licenses {
     user-select: none;
 }
 .window .titlebar {
-    margin: 10px;
+    margin: 0;
+    padding: 10px;
     display: flex;
 }
 .window:not(.grabbed) .titlebar {

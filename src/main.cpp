@@ -46,7 +46,7 @@ auto page() {
     struct Window : component<Window> {
         Window(std::string_view id, std::string_view title, fragment&& content) : component<Window>{
             dv { {_id{id}, _class{"window"}},
-                dv { {_class{"titlebar"}},
+                dv { {_id{std::string{id}+"__titlebar"}, _class{"titlebar"}},
                     h3 {title},
                     button { {_class{"minimize"}},"_"},
                     button { {_class{"maximize"}},"□"},
@@ -120,20 +120,26 @@ int main() {
     });
 
     for(const auto& window : {"source_code", "licenses", "build_info"}) {
-        web::add_event_listener(window, "mousedown", [w = std::string{window}](std::string_view j) {
+        web::add_event_listener(std::string{window}+"__titlebar", "mousedown", [w = std::string{window}](std::string_view j) {
             nlohmann::json json = nlohmann::json::parse(j);
+            if(json["button"] != 0)
+                return;
             int offsetLeft = web::get_property_int(w, "offsetLeft");
             int offsetTop = web::get_property_int(w, "offsetTop");
             grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
             grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
             grabbed_window = w;
+            web::set_property(w, "classList", "window grabbed");
         });
     }
 
-    web::add_event_listener("main", "mouseup", [](std::string_view) {
+    web::add_event_listener("__document__", "mouseup", [](std::string_view) {
+        if(grabbed_window.empty())
+            return;
+        web::set_property(grabbed_window, "classList", "window");
         grabbed_window = "";
     });
-    web::add_event_listener("main", "mousemove", [](std::string_view j) {
+    web::add_event_listener("__document__", "mousemove", [](std::string_view j) {
         if(grabbed_window.empty())
             return;
         nlohmann::json json = nlohmann::json::parse(j);

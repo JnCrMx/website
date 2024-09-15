@@ -59,7 +59,6 @@
                         const id = get_string(instance, id_ptr, id_len);
                         const property = get_string(instance, property_ptr, property_len);
                         const value = get_string(instance, value_ptr, value_len);
-                        console.log(id, property, value);
                         document.getElementById(id)[property] = value;
                     },
                     get_property: (id_ptr, id_len, property_ptr, property_len) => {
@@ -74,7 +73,8 @@
                     add_event_listener: (id_ptr, id_len, event_ptr, event_len, ptr, once) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const event = get_string(instance, event_ptr, event_len);
-                        document.getElementById(id).addEventListener(event, (e) => {
+                        const element = id === "__document__" ? document : document.getElementById(id);
+                        element.addEventListener(event, (e) => {
                             e.preventDefault();
                             const [str_ptr, len] = copy_string(instance, stringifyEvent(e));
                             instance.exports.callback(ptr, str_ptr, len);
