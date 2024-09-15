@@ -20,7 +20,7 @@ auto page() {
     using namespace Webxx;
 
     return fragment{
-        h1{"Hello ", i{"world!"}},
+        h1{"Hello from JCM!"},
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
         details{

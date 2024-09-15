@@ -30,9 +30,8 @@ steps:
         -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
-      - mkdir -p build/public
-      - cp build/website.wasm build/public/
-      - cp index.html build/public/
+      - cp -r public build/public
+      - cp build/website.wasm build/public/website.wasm
       - wasm-strip build/public/website.wasm
   upload-logs:
     image: woodpeckerci/plugin-s3
