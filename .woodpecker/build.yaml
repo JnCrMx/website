@@ -31,6 +31,7 @@ steps:
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
       - cp -r public build/public
+      - rm build/public/website.wasm # remove dangling symlink
       - cp build/website.wasm build/public/website.wasm
       - wasm-strip build/public/website.wasm
   upload-logs:
