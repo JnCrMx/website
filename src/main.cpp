@@ -7,20 +7,23 @@ import web_coro;
 #include <webxx.h>
 #include <nlohmann/json.hpp>
 
-constexpr char this_file[] = {
-#embed __FILE__
-};
-constexpr std::string_view this_file_view{this_file, sizeof(this_file)};
+namespace files {
+    constexpr char src_main[] = {
+        #embed "src/main.cpp"
+    };
+    constexpr char webxx_license[] = {
+        #embed "build/_deps/webxx-src/LICENSE.md"
+    };
+    constexpr char json_license[] = {
+        #embed "build/_deps/json-src/LICENSE.MIT"
+    };
 
-constexpr char webxx_license[] = {
-#embed "../build/_deps/webxx-src/LICENSE.md"
-};
-constexpr std::string_view webxx_license_view{webxx_license, sizeof(webxx_license)};
-
-constexpr char json_license[] = {
-#embed "../build/_deps/json-src/LICENSE.MIT"
-};
-constexpr std::string_view json_license_view{json_license, sizeof(json_license)};
+    namespace views {
+        constexpr std::string_view src_main{::files::src_main, sizeof(::files::src_main)};
+        constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
+        constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
+    }
+}
 
 #ifdef __clang__
 constexpr auto cxx_compiler_name = "clang++";
@@ -65,20 +68,21 @@ auto page() {
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
         Window{"source_code", "Source Code", fragment{
+            a{{_href{"https://git.jcm.re/jcm/website"}, _style{"display: flex; align-items: center;"}}, img{{_src{"https://git.jcm.re/assets/img/logo.svg"}}}, b{"GitHug"}},
             details{
-                summary{a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, __FILE__}},
-                pre{this_file_view},
+                summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
+                pre{files::views::src_main},
             },
         }},
         Window{"licenses", "Licenses", fragment{
             ul{ {_class{"licenses"}},
                 li{details{
                     summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
-                    pre{webxx_license_view},
+                    pre{files::views::webxx_license},
                 }},
                 li{details{
                     summary{a{{_href{"https://github.com/nlohmann/json"}, _target{"_blank"}}, code{"nlohmann::json"}}},
-                    pre{json_license_view},
+                    pre{files::views::json_license},
                 }},
             },
         }},
