@@ -1,5 +1,6 @@
 import web;
 import web_coro;
+import utils;
 import nlohmann_json;
 import webxx;
 
@@ -7,7 +8,7 @@ import webxx;
 #include <chrono>
 
 namespace files {
-    constexpr char src_main[] = {
+    constexpr char src_main[] = { // secrets in this file will be optimized away :D
         #embed "src/main.cpp"
     };
     constexpr char webxx_license[] = {
@@ -18,29 +19,23 @@ namespace files {
     };
 
     namespace views {
-        constexpr std::string_view src_main{::files::src_main, sizeof(::files::src_main)};
         constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
         constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
     }
+    namespace arrays {
+        constexpr auto src_main = std::to_array(::files::src_main);
+    }
 }
 
-#ifdef __clang__
-constexpr auto cxx_compiler_name = "clang++";
-constexpr auto cxx_compiler_version_major = __clang_major__;
-constexpr auto cxx_compiler_version_minor = __clang_minor__;
-constexpr auto cxx_compiler_version_patch = __clang_patchlevel__;
-#else
-constexpr auto cxx_compiler_name = "g++";
-constexpr auto cxx_compiler_version_major = __GNUC__;
-constexpr auto cxx_compiler_version_minor = __GNUC_MINOR__;
-constexpr auto cxx_compiler_version_patch = __GNUC_PATCHLEVEL__;
-#endif
-
-struct WindowData {
-    std::string id;
-    int x;
-    int y;
-};
+constexpr auto src_main_sanitised_array = [](){
+    constexpr auto s0 = files::arrays::src_main;
+    constexpr auto s1 = utils::replace_sub_str<s0, std::to_array("<"), std::to_array("&lt;")>();
+    constexpr auto s2 = utils::replace_sub_str<s1, std::to_array(">"), std::to_array("&gt;")>();
+    constexpr auto s3 = utils::replace_sub_str<s2, std::to_array("cyndi"), std::to_array("redacted")>();
+    constexpr auto s4 = utils::replace_sub_str<s3, std::to_array("Cyndi"), std::to_array("redacted")>();
+    return s4;
+}();
+constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
 
 auto page(bool cyndi) {
     using namespace Webxx;
@@ -70,7 +65,7 @@ auto page(bool cyndi) {
             a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}, _style{"display: flex; align-items: center;"}}, img{{_src{"https://git.jcm.re/assets/img/logo.svg"}}}, b{"GitHug"}},
             details{
                 summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
-                pre{files::views::src_main},
+                pre{src_main_sanitised},
             },
         }},
         Window{"licenses", "Licenses", fragment{
@@ -88,8 +83,8 @@ auto page(bool cyndi) {
         Window{"build_info", "Build Info", fragment{
             std::format(
                 "Built on {} at {} with {} version {}.{}.{}.",
-                __DATE__, __TIME__, cxx_compiler_name,
-                cxx_compiler_version_major, cxx_compiler_version_minor, cxx_compiler_version_patch
+                __DATE__, __TIME__, utils::cxx_compiler_name,
+                utils::cxx_compiler_version_major, utils::cxx_compiler_version_minor, utils::cxx_compiler_version_patch
             )
         }},
         maybe(cyndi, [](){

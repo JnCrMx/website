@@ -37,8 +37,18 @@ target_sources(jsonModule PUBLIC FILE_SET CXX_MODULES FILES third_party/json.cpp
 target_compile_features(jsonModule PUBLIC cxx_std_23)
 target_link_libraries(jsonModule PUBLIC nlohmann_json::nlohmann_json)
 
-add_executable(website src/main.cpp src/c++support.cpp)
-target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES src/web.cppm src/web_coro.cppm)
+set(SOURCES
+    src/main.cpp
+    src/c++support.cpp
+)
+set(MODULE_SOURCES
+    src/web.cppm
+    src/web_coro.cppm
+    src/utils.cppm
+)
+
+add_executable(website ${SOURCES})
+target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES ${MODULE_SOURCES})
 target_compile_features(website PRIVATE cxx_std_23)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
