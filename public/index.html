@@ -88,6 +88,19 @@
                             instance.exports.callback(ptr, 0, 0);
                         }, ms);
                     },
+                    fetch: (url_ptr, url_len, ptr) => {
+                        const url = get_string(instance, url_ptr, url_len);
+                        fetch(url).then(response => {
+                            return response.text();
+                        }).then(text => {
+                            const [str_ptr, len] = copy_string(instance, text);
+                            instance.exports.callback(ptr, str_ptr, len);
+                            delete_string(instance, str_ptr);
+                        }).catch(error => {
+                            console.error(error);
+                            instance.exports.callback(ptr, 0, 0);
+                        });
+                    },
                 },
                 wasi_snapshot_preview1: {
                     fd_close: () => { console.log("fd_close"); },

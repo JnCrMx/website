@@ -94,12 +94,20 @@ auto page(bool cyndi) {
         }},
         maybe(cyndi, [](){
             return Window{"cyndi", "Cyndi", fragment{
-                h1{"I love you 🩷"}
+                h1{"I love you 🩷"},
+                dv{{_id{"cyndi_content"}},
+                    input{{_id{"cyndi_password"}, _type{"password"}, _placeholder{"Password"}}},
+                    button{{_id{"cyndi_submit"}}, "💌"},
+                },
             }};
         }),
         details {
             summary{"A JS Event"},
             pre{{_id{"event_test"}}},
+        },
+        details {
+            summary{"Some fetched data"},
+            pre{{_id{"fetch_test"}}},
         },
     };
 }
@@ -171,12 +179,24 @@ int main() {
     using namespace web::coro;
     submit([]()->coroutine<void> {
         co_await event{"test", "click"};
+        std::string res = co_await fetch("https://files.jcm.re/status");
+        web::set_html("fetch_test", "Response: {}", res);
         for(int i=0; i<100; i++) {
             web::set_html("counter", "Coroutine counter = {}", i);
             co_await timeout(std::chrono::milliseconds(100));
         }
         co_return;
     }());
+
+    if(cyndi) {
+        submit([]()->coroutine<void> {
+            co_await event{"cyndi_submit", "click"};
+            std::string password = web::get_property("cyndi_password", "value");
+            std::string res = co_await fetch("https://files.jcm.re/cyndi/"+password);
+            web::set_html("cyndi_content", res);
+            co_return;
+        }());
+    }
 
     return 0;
 }

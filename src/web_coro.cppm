@@ -97,7 +97,7 @@ export struct timeout {
     timeout(std::chrono::milliseconds duration) : duration(duration) {}
 
     bool await_ready() const noexcept { return false; }
-    bool await_suspend(std::coroutine_handle<promise<void>> handle) noexcept {
+    bool await_suspend(std::coroutine_handle<> handle) noexcept {
         this->handle = handle;
         web::set_timeout(duration, [handle](std::string_view) {
             handle.resume();
@@ -117,7 +117,7 @@ export struct event {
     event(std::string_view id, std::string_view event_type) : id(id), event_type(event_type) {}
 
     bool await_ready() const noexcept { return false; }
-    bool await_suspend(std::coroutine_handle<promise<void>> handle) noexcept {
+    bool await_suspend(std::coroutine_handle<> handle) noexcept {
         this->handle = handle;
         web::add_event_listener(id, event_type, [this](std::string_view data) {
             if(data.size()) {
@@ -125,6 +125,28 @@ export struct event {
             }
             this->handle.resume();
         }, true);
+        return true;
+    }
+    std::string await_resume() const noexcept {
+        return data;
+    }
+};
+
+export struct fetch {
+    std::string_view url;
+    std::coroutine_handle<> handle;
+
+    std::string data{};
+
+    fetch(std::string_view url) : url(url) {}
+
+    bool await_ready() const noexcept { return false; }
+    bool await_suspend(std::coroutine_handle<> handle) noexcept {
+        this->handle = handle;
+        web::fetch(url, [this](std::string_view data) {
+            this->data = data;
+            this->handle.resume();
+        });
         return true;
     }
     std::string await_resume() const noexcept {

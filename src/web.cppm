@@ -15,6 +15,7 @@ namespace web {
     [[clang::import_name("log")]] void log(const char*, size_t);
     [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*, bool);
     [[clang::import_name("set_timeout")]] void set_timeout(unsigned long, void*);
+    [[clang::import_name("fetch")]] void fetch(const char*, size_t, void*);
 
     [[clang::export_name("new_string")]]
     char* new_string(size_t len) {
@@ -82,13 +83,16 @@ namespace web {
     };
 
     export void add_event_listener(std::string_view id, std::string_view event, event_callback callback, bool once = false) {
-        callback_data* data = new callback_data{callback, once};
-        add_event_listener(id.data(), id.size(), event.data(), event.size(), data, once);
+        add_event_listener(id.data(), id.size(), event.data(), event.size(),
+            new callback_data{callback, once}, once);
     }
 
     export void set_timeout(std::chrono::milliseconds duration, event_callback callback) {
-        callback_data* data = new callback_data{callback, true};
-        set_timeout(duration.count(), data);
+        set_timeout(duration.count(), new callback_data{callback, true});
+    }
+
+    export void fetch(std::string_view url, event_callback callback) {
+        fetch(url.data(), url.size(), new callback_data{callback, true});
     }
 
     [[clang::export_name("callback")]]

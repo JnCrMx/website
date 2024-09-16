@@ -29,6 +29,22 @@ dt {
     font-weight: bold;
 }
 
+input {
+    border-radius: 9px;
+    padding: 5px;
+    border: 1px solid #444;
+    margin: 5px;
+}
+button {
+    border-radius: 9px;
+    padding: 5px;
+    border: 1px solid #444;
+    background-color: #EEE;
+}
+button:hover {
+    background-color: #DDD;
+}
+
 ul.licenses {
     margin-top: 0;
     margin-bottom: 0;
