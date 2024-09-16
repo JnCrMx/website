@@ -6,6 +6,11 @@ body{
     padding: 0 10px;
     font-family: sans-serif;
 }
+@media screen and (min-width: 800px) and (orientation: landscape) {
+    body {
+        overflow: hidden;
+    }
+}
 h1, h2, h3 {
     line-height:1.2;
 }
