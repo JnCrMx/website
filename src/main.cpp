@@ -154,8 +154,8 @@ int main() {
         }
     });
 
-    setup_window("source_code", 300, 200);
-    setup_window("licenses", 700, 300);
+    setup_window("source_code", 250, 200);
+    setup_window("licenses", 700, 350);
     setup_window("build_info", 20, 400);
     if(cyndi) {
         setup_window("cyndi", 600, 100);
