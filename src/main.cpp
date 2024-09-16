@@ -112,10 +112,11 @@ auto page(bool cyndi) {
     };
 }
 void move_window(std::string_view id, int x, int y) {
-    web::set_property(id, "style", "left: {}px; top: {}px;", x, y);
+    web::set_style_property(id, "left", "{}px", x);
+    web::set_style_property(id, "top", "{}px", y);
 }
 
-
+int highest_z_index = 1;
 int grab_start_x = 0;
 int grab_start_y = 0;
 std::string grabbed_window = "";
@@ -131,6 +132,9 @@ void setup_window(std::string id, int initial_x, int initial_y) {
         grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
         grabbed_window = id;
         web::set_property(id, "classList", "window grabbed");
+    }, false, true);
+    web::add_event_listener(id, "mousedown", [id](std::string_view) {
+        web::set_style_property(id, "zIndex", "{}", highest_z_index++);
     });
     move_window(id, initial_x, initial_y);
 }

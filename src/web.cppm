@@ -12,8 +12,9 @@ namespace web {
     [[clang::import_name("set_html")]] void set_html(const char*, size_t, const char*, size_t);
     [[clang::import_name("set_property")]] void set_property(const char*, size_t, const char*, size_t, const char*, size_t);
     [[clang::import_name("get_property")]] char* get_property(const char*, size_t, const char*, size_t);
+    [[clang::import_name("set_style_property")]] void set_style_property(const char*, size_t, const char*, size_t, const char*, size_t);
     [[clang::import_name("log")]] void log(const char*, size_t);
-    [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*, bool);
+    [[clang::import_name("add_event_listener")]] void add_event_listener(const char*, size_t, const char*, size_t, void*, bool, bool);
     [[clang::import_name("set_timeout")]] void set_timeout(unsigned long, void*);
     [[clang::import_name("fetch")]] void fetch(const char*, size_t, void*);
 
@@ -76,15 +77,24 @@ namespace web {
         return std::stoi(get_property(id, property));
     }
 
+    export void set_style_property(std::string_view id, std::string_view property, std::string_view value) {
+        set_style_property(id.data(), id.size(), property.data(), property.size(), value.data(), value.size());
+    }
+    export template<class... Args>
+    void set_style_property(std::string_view id, std::string_view property, std::format_string<Args...> value, Args&&... args) {
+        std::string s = std::format(value, std::forward<Args>(args)...);
+        set_style_property(id.data(), id.size(), property.data(), property.size(), s.data(), s.size());
+    }
+
     using event_callback = std::function<void(std::string_view)>;
     struct callback_data {
         event_callback callback;
         bool once = false;
     };
 
-    export void add_event_listener(std::string_view id, std::string_view event, event_callback callback, bool once = false) {
+    export void add_event_listener(std::string_view id, std::string_view event, event_callback callback, bool once = false, bool prevent_default = false) {
         add_event_listener(id.data(), id.size(), event.data(), event.size(),
-            new callback_data{callback, once}, once);
+            new callback_data{callback, once}, once, prevent_default);
     }
 
     export void set_timeout(std::chrono::milliseconds duration, event_callback callback) {
