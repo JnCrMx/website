@@ -27,7 +27,8 @@ steps:
       - mkdir build
       - >-
         cmake -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel
-        -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCMAKE_AR=llvm-ar-20
+        -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 
+        -DCMAKE_C_COMPILER_AR=llvm-ar-20 -DCMAKE_CXX_COMPILER_AR=llvm-ar-20
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
       - cp -r public build/public
