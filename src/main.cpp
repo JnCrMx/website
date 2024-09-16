@@ -29,11 +29,12 @@ namespace files {
 
 constexpr auto src_main_sanitised_array = [](){
     constexpr auto s0 = files::arrays::src_main;
-    constexpr auto s1 = utils::replace_sub_str<s0, std::to_array("<"), std::to_array("&lt;")>();
-    constexpr auto s2 = utils::replace_sub_str<s1, std::to_array(">"), std::to_array("&gt;")>();
-    constexpr auto s3 = utils::replace_sub_str<s2, std::to_array("cyndi"), std::to_array("redacted")>();
-    constexpr auto s4 = utils::replace_sub_str<s3, std::to_array("Cyndi"), std::to_array("redacted")>();
-    return s4;
+    constexpr auto s1 = utils::replace_sub_str<s0, std::to_array("&"), std::to_array("&amp;")>();
+    constexpr auto s2 = utils::replace_sub_str<s1, std::to_array("<"), std::to_array("&lt;")>();
+    constexpr auto s3 = utils::replace_sub_str<s2, std::to_array(">"), std::to_array("&gt;")>();
+    constexpr auto s4 = utils::replace_sub_str<s3, std::to_array("cyndi"), std::to_array("redacted")>();
+    constexpr auto s5 = utils::replace_sub_str<s4, std::to_array("Cyndi"), std::to_array("redacted")>();
+    return s5;
 }();
 constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
 
