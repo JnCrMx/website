@@ -1,11 +1,10 @@
 import web;
 import web_coro;
+import nlohmann_json;
+import webxx;
 
 #include <coroutine>
 #include <chrono>
-
-#include <webxx.h>
-#include <nlohmann/json.hpp>
 
 namespace files {
     constexpr char src_main[] = {
@@ -43,7 +42,7 @@ struct WindowData {
     int y;
 };
 
-auto page() {
+auto page(bool cyndi) {
     using namespace Webxx;
 
     struct Window : component<Window> {
@@ -93,6 +92,11 @@ auto page() {
                 cxx_compiler_version_major, cxx_compiler_version_minor, cxx_compiler_version_patch
             )
         }},
+        maybe(cyndi, [](){
+            return Window{"cyndi", "Cyndi", fragment{
+                h1{"I love you 🩷"}
+            }};
+        }),
         details {
             summary{"A JS Event"},
             pre{{_id{"event_test"}}},
@@ -108,10 +112,29 @@ int grab_start_x = 0;
 int grab_start_y = 0;
 std::string grabbed_window = "";
 
+void setup_window(std::string id, int initial_x, int initial_y) {
+    web::add_event_listener(id+"__titlebar", "mousedown", [id](std::string_view j) {
+        nlohmann::json json = nlohmann::json::parse(j);
+        if(json["button"] != 0)
+            return;
+        int offsetLeft = web::get_property_int(id, "offsetLeft");
+        int offsetTop = web::get_property_int(id, "offsetTop");
+        grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
+        grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
+        grabbed_window = id;
+        web::set_property(id, "classList", "window grabbed");
+    });
+    move_window(id, initial_x, initial_y);
+}
+
 [[clang::export_name("main")]]
 int main() {
     web::log("Hello World!");
-    web::set_html("main", Webxx::render(page()));
+
+    std::string hash = web::eval("location.hash");
+    bool cyndi = hash == "#cyndi";
+
+    web::set_html("main", Webxx::render(page(cyndi)));
     web::add_event_listener("test", "click", [i=0](std::string_view json) mutable {
         web::set_html("test", "You clicked me {} times!", ++i);
         nlohmann::json j = nlohmann::json::parse(json);
@@ -123,18 +146,11 @@ int main() {
         }
     });
 
-    for(const auto& window : {"source_code", "licenses", "build_info"}) {
-        web::add_event_listener(std::string{window}+"__titlebar", "mousedown", [w = std::string{window}](std::string_view j) {
-            nlohmann::json json = nlohmann::json::parse(j);
-            if(json["button"] != 0)
-                return;
-            int offsetLeft = web::get_property_int(w, "offsetLeft");
-            int offsetTop = web::get_property_int(w, "offsetTop");
-            grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
-            grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
-            grabbed_window = w;
-            web::set_property(w, "classList", "window grabbed");
-        });
+    setup_window("source_code", 300, 200);
+    setup_window("licenses", 700, 300);
+    setup_window("build_info", 20, 400);
+    if(cyndi) {
+        setup_window("cyndi", 600, 100);
     }
 
     web::add_event_listener("__document__", "mouseup", [](std::string_view) {
@@ -151,10 +167,6 @@ int main() {
         int x = static_cast<int>(json["clientX"]) - grab_start_x;
         move_window(grabbed_window, x, y);
     });
-
-    move_window("source_code", 300, 200);
-    move_window("licenses", 700, 300);
-    move_window("build_info", 20, 400);
 
     using namespace web::coro;
     submit([]()->coroutine<void> {

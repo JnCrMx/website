@@ -38,7 +38,7 @@
             const data = new Uint8Array(instance.exports.memory.buffer, str_ptr, buffer.length+1);
             data.set(buffer);
             data[buffer.length] = 0;
-            return [str_ptr, buffer.length];
+            return str_ptr;
         }
         function delete_string(instance, ptr) {
             instance.exports.delete_string(ptr);
@@ -49,7 +49,9 @@
             const importObject = {
                 env: {
                     eval: (ptr, len) => {
-                        eval(get_string(instance, ptr, len));
+                        const res = eval(get_string(instance, ptr, len));
+                        const str_ptr = copy_string_null(instance, res.toString());
+                        return str_ptr;
                     },
                     set_html: (id_ptr, id_len, html_ptr, html_len) => {
                         const id = get_string(instance, id_ptr, id_len);
@@ -64,7 +66,7 @@
                     get_property: (id_ptr, id_len, property_ptr, property_len) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const property = get_string(instance, property_ptr, property_len);
-                        const [str_ptr, len] = copy_string_null(instance, document.getElementById(id)[property]);
+                        const str_ptr = copy_string_null(instance, document.getElementById(id)[property]);
                         return str_ptr;
                     },
                     log: (ptr, len) => {

@@ -8,7 +8,7 @@ module;
 export module web;
 
 namespace web {
-    [[clang::import_name("eval")]] void eval(const char*, size_t);
+    [[clang::import_name("eval")]] char* eval(const char*, size_t);
     [[clang::import_name("set_html")]] void set_html(const char*, size_t, const char*, size_t);
     [[clang::import_name("set_property")]] void set_property(const char*, size_t, const char*, size_t, const char*, size_t);
     [[clang::import_name("get_property")]] char* get_property(const char*, size_t, const char*, size_t);
@@ -35,13 +35,16 @@ namespace web {
         log(s.data(), s.size());
     }
 
-    export void eval(std::string_view code) {
-        eval(code.data(), code.size());
+    export std::string eval(std::string_view code) {
+        char* str_ptr = eval(code.data(), code.size());
+        std::string s{str_ptr};
+        delete_string(str_ptr);
+        return s;
     }
     export template<class... Args>
-    void eval(std::format_string<Args...> code, Args&&... args) {
+    std::string eval(std::format_string<Args...> code, Args&&... args) {
         std::string s = std::format(code, std::forward<Args>(args)...);
-        eval(s.data(), s.size());
+        return eval(s);
     }
 
     export void set_html(std::string_view id, std::string_view html) {
