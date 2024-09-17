@@ -69,7 +69,7 @@ namespace windows {
                 a{{_href{"https://blog.jcm.re/"}, _target{"_blank"}},
                     img{{_src{"https://files.jcm.re/blog_icon.png"}, _title{"Blog"}}}},
                 a{{_href{"https://keys.openpgp.org/vks/v1/by-fingerprint/7B839F0DA64069DD7832BB802F536DE3E9EC3AD8"}, _target{"_blank"}},
-                    img{{_src{"https://www.openpgp.org/images/bio-photo.jpg"}, _title{"OpenPGP"}}}},
+                    img{{_src{"https://www.openpgp.org/images/apple-touch-icon.png"}, _title{"OpenPGP"}}}},
             }
         }
     };
