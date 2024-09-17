@@ -57,9 +57,38 @@ namespace windows {
         } {}
     };
 
+    const Window about_me{"about_me", "About Me",
+        fragment{
+            h1{"JCM"},
+            p{"I'm a software developer and computer engineering student."},
+        }
+    };
+    const Window projects{"projects", "Projects",
+        fragment{
+            p{
+                "I have plenty of public projects!<br>",
+                "Some of them are hosted on ", a{{_href{"https://github.com/JnCrMx/"}, _target{"_blank"}}, "GitHub"},
+                " and some on my own self-hosted ", a{{_href{"https://git.jcm.re/jcm/"}, _target{"_blank"}}, "Forgejo instance"},
+                ".",
+            },
+            p{"Some of them are:"},
+            ul{
+                li{"A ", a{{_href{"https://git.jcm.re/jcm/webxx"}, _target{"_blank"}}, "C++ Web Framework"}, "."},
+                li{"A ", a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Website"}, "."},
+                li{"A ", a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Web-based IDE"}, "."},
+            },
+        }
+    };
     const Window source_code{"source_code", "Source Code", 
         fragment{
-            a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}, _style{"display: flex; align-items: center;"}}, img{{_src{"https://git.jcm.re/assets/img/logo.svg"}}}, b{"GitHug"}},
+            p{
+                "This website is mostly written in C++ 23 using WASM and the ", code{"webxx"}, " library.<br>",
+                "It is compiled with ", code{"clang"}, " and ", code{"lld"}, " (version 20) and built with ", code{"CMake"}, ".<br>",
+                "To provide a (more or less complete) standard library, ", code{"libc++-wasm32"} , " is used.<br>",
+                "It is using C++ named modules and coroutines just for fun and to test how well these modern features work already ", i{"(quite well!)"}, ".<br>",
+                "Interaction with the DOM and other browser APIs is done with self-made bindings (the ", code{"web"}, " and ", code{"web_coro"}, " modules).<br>",
+            },
+            p{"You can find the source code of the main file (in which I am typing this text right now) here:"},
             details{
                 summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
                 pre{src_main_sanitised},
@@ -106,6 +135,8 @@ auto page(bool cyndi) {
         h1{"Hello from JCM!"},
         button{{_id{"test"}}, "Click me!"},
         h2{{_id{"counter"}}, "Coroutine counter = 0"},
+        windows::about_me,
+        windows::projects,
         windows::source_code,
         windows::licenses,
         windows::build_info,
@@ -167,11 +198,13 @@ int main() {
         }
     });
 
-    setup_window("source_code", 250, 200);
-    setup_window("licenses", 700, 350);
-    setup_window("build_info", 20, 400);
+    setup_window("about_me", 75, 50);
+    setup_window("projects", 800, 100);
+    setup_window("source_code", 700, 500);
+    setup_window("licenses", 100, 550);
+    setup_window("build_info", 50, 800);
     if(cyndi) {
-        setup_window("cyndi", 600, 100);
+        setup_window("cyndi", 400, 300);
     }
 
     web::add_event_listener("__document__", "mouseup", [](std::string_view) {

@@ -33,6 +33,9 @@ pre {
 dt {
     font-weight: bold;
 }
+p {
+    margin-top: 0;
+}
 
 input {
     border-radius: 9px;
@@ -67,7 +70,7 @@ ul.licenses {
     position: absolute;
     background-color: #FFF;
 
-    max-width: 75%;
+    max-width: 50%;
     max-height: 75%;
     display: flex;
     flex-direction: column;
