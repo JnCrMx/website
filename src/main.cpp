@@ -32,8 +32,8 @@ constexpr auto src_main_sanitised_array = [](){
     constexpr auto s1 = utils::replace_sub_str<s0, std::to_array("&"), std::to_array("&amp;")>();
     constexpr auto s2 = utils::replace_sub_str<s1, std::to_array("<"), std::to_array("&lt;")>();
     constexpr auto s3 = utils::replace_sub_str<s2, std::to_array(">"), std::to_array("&gt;")>();
-    constexpr auto s4 = utils::replace_sub_str<s3, std::to_array("cyndi"), std::to_array("redacted")>();
-    constexpr auto s5 = utils::replace_sub_str<s4, std::to_array("Cyndi"), std::to_array("redacted")>();
+    constexpr auto s4 = utils::replace_sub_str<s3, std::to_array("cyndi"), std::to_array("secret")>();
+    constexpr auto s5 = utils::replace_sub_str<s4, std::to_array("Cyndi"), std::to_array("secret")>();
     return s5;
 }();
 constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
@@ -91,9 +91,9 @@ auto page(bool cyndi) {
         maybe(cyndi, [](){
             return Window{"cyndi", "Cyndi", fragment{
                 h1{"I love you 🩷"},
-                dv{{_id{"cyndi_content"}},
-                    input{{_id{"cyndi_password"}, _type{"password"}, _placeholder{"Password"}}},
-                    button{{_id{"cyndi_submit"}}, "💌"},
+                dv{{_id{"secret_content"}},
+                    input{{_id{"secret_password"}, _type{"password"}, _placeholder{"Password"}}},
+                    button{{_id{"secret_submit"}}, "💌"},
                 },
             }};
         }),
@@ -190,10 +190,10 @@ int main() {
 
     if(cyndi) {
         submit([]()->coroutine<void> {
-            co_await event{"cyndi_submit", "click"};
-            std::string password = web::get_property("cyndi_password", "value");
-            std::string res = co_await fetch("https://files.jcm.re/cyndi/"+password);
-            web::set_html("cyndi_content", res);
+            co_await event{"secret_submit", "click"};
+            std::string password = web::get_property("secret_password", "value");
+            std::string res = co_await fetch("https://files.jcm.re/website_secret/"+password);
+            web::set_html("secret_content", res);
             co_return;
         }());
     }
