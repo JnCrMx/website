@@ -133,22 +133,12 @@ auto page(bool cyndi) {
     using namespace Webxx;
     return fragment{
         h1{"Hello from JCM!"},
-        button{{_id{"test"}}, "Click me!"},
-        h2{{_id{"counter"}}, "Coroutine counter = 0"},
         windows::about_me,
         windows::projects,
         windows::source_code,
         windows::licenses,
         windows::build_info,
         maybe(cyndi, [](){return windows::cyndi;}),
-        details {
-            summary{"A JS Event"},
-            pre{{_id{"event_test"}}},
-        },
-        details {
-            summary{"Some fetched data"},
-            pre{{_id{"fetch_test"}}},
-        },
     };
 }
 void move_window(std::string_view id, int x, int y) {
@@ -187,16 +177,6 @@ int main() {
     bool cyndi = hash == "#cyndi";
 
     web::set_html("main", Webxx::render(page(cyndi)));
-    web::add_event_listener("test", "click", [i=0](std::string_view json) mutable {
-        web::set_html("test", "You clicked me {} times!", ++i);
-        nlohmann::json j = nlohmann::json::parse(json);
-        web::set_html("event_test", j.dump(4));
-        if(i == 10) {
-            web::set_timeout(std::chrono::milliseconds(1000), [](std::string_view){
-                web::eval("alert('You clicked me 10 times!')");
-            });
-        }
-    });
 
     setup_window("about_me", 75, 50);
     setup_window("projects", 800, 100);
@@ -223,17 +203,6 @@ int main() {
     });
 
     using namespace web::coro;
-    submit([]()->coroutine<void> {
-        co_await event{"test", "click"};
-        std::string res = co_await fetch("https://files.jcm.re/status");
-        web::set_html("fetch_test", "Response: {}", res);
-        for(int i=0; i<100; i++) {
-            web::set_html("counter", "Coroutine counter = {}", i);
-            co_await timeout(std::chrono::milliseconds(100));
-        }
-        co_return;
-    }());
-
     if(cyndi) {
         submit([]()->coroutine<void> {
             co_await event{"secret_submit", "click"};
