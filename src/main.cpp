@@ -61,6 +61,16 @@ namespace windows {
         fragment{
             h1{"JCM"},
             p{"I'm a software developer and computer engineering student."},
+            dv{{_class{"socials"}},
+                a{{_href{"https://github.com/JnCrMx/"}, _target{"_blank"}},
+                    img{{_src{"https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"}, _title{"GitHub"}}}},
+                a{{_href{"https://git.jcm.re/jcm/"}, _target{"_blank"}},
+                    img{{_src{"https://git.jcm.re/assets/img/logo.svg"}, _title{"Forgejo instance"}}}},
+                a{{_href{"https://blog.jcm.re/"}, _target{"_blank"}},
+                    img{{_src{"https://files.jcm.re/blog_icon.png"}, _title{"Blog"}}}},
+                a{{_href{"https://keys.openpgp.org/vks/v1/by-fingerprint/7B839F0DA64069DD7832BB802F536DE3E9EC3AD8"}, _target{"_blank"}},
+                    img{{_src{"https://www.openpgp.org/images/bio-photo.jpg"}, _title{"OpenPGP"}}}},
+            }
         }
     };
     const Window projects{"projects", "Projects",
@@ -73,9 +83,6 @@ namespace windows {
             },
             p{"Some of them are:"},
             ul{
-                li{"A ", a{{_href{"https://git.jcm.re/jcm/webxx"}, _target{"_blank"}}, "C++ Web Framework"}, "."},
-                li{"A ", a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Website"}, "."},
-                li{"A ", a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}}, "Web-based IDE"}, "."},
             },
         }
     };
