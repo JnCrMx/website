@@ -38,11 +38,10 @@ constexpr auto src_main_sanitised_array = [](){
 }();
 constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
 
-auto page(bool cyndi) {
+namespace windows {
     using namespace Webxx;
-
     struct Window : component<Window> {
-        Window(std::string_view id, std::string_view title, fragment&& content) : component<Window>{
+        constexpr Window(std::string_view id, std::string_view title, fragment&& content) : component<Window>{
             dv { {_id{id}, _class{"window"}},
                 dv { {_id{std::string{id}+"__titlebar"}, _class{"titlebar"}},
                     h3 {title},
@@ -58,18 +57,17 @@ auto page(bool cyndi) {
         } {}
     };
 
-    return fragment{
-        h1{"Hello from JCM!"},
-        button{{_id{"test"}}, "Click me!"},
-        h2{{_id{"counter"}}, "Coroutine counter = 0"},
-        Window{"source_code", "Source Code", fragment{
+    const Window source_code{"source_code", "Source Code", 
+        fragment{
             a{{_href{"https://git.jcm.re/jcm/website"}, _target{"_blank"}, _style{"display: flex; align-items: center;"}}, img{{_src{"https://git.jcm.re/assets/img/logo.svg"}}}, b{"GitHug"}},
             details{
                 summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
                 pre{src_main_sanitised},
             },
-        }},
-        Window{"licenses", "Licenses", fragment{
+        }
+    };
+    const Window licenses{"licenses", "Licenses",
+        fragment{
             ul{ {_class{"licenses"}},
                 li{details{
                     summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
@@ -80,23 +78,38 @@ auto page(bool cyndi) {
                     pre{files::views::json_license},
                 }},
             },
-        }},
-        Window{"build_info", "Build Info", fragment{
+        }
+    };
+    const Window build_info{"build_info", "Build Info",
+        fragment{
             std::format(
                 "Built on {} at {} with {} version {}.{}.{}.",
                 __DATE__, __TIME__, utils::cxx_compiler_name,
                 utils::cxx_compiler_version_major, utils::cxx_compiler_version_minor, utils::cxx_compiler_version_patch
             )
-        }},
-        maybe(cyndi, [](){
-            return Window{"cyndi", "Cyndi", fragment{
-                h1{"I love you 🩷"},
-                dv{{_id{"secret_content"}},
-                    input{{_id{"secret_password"}, _type{"password"}, _placeholder{"Password"}}},
-                    button{{_id{"secret_submit"}}, "💌"},
-                },
-            }};
-        }),
+        }
+    };
+    const Window cyndi{"cyndi", "Cyndi",
+        fragment{
+            h1{"I love you 🩷"},
+            dv{{_id{"secret_content"}},
+                input{{_id{"secret_password"}, _type{"password"}, _placeholder{"Password"}}},
+                button{{_id{"secret_submit"}}, "💌"},
+            },
+        }
+    };
+}
+
+auto page(bool cyndi) {
+    using namespace Webxx;
+    return fragment{
+        h1{"Hello from JCM!"},
+        button{{_id{"test"}}, "Click me!"},
+        h2{{_id{"counter"}}, "Coroutine counter = 0"},
+        windows::source_code,
+        windows::licenses,
+        windows::build_info,
+        maybe(cyndi, [](){return windows::cyndi;}),
         details {
             summary{"A JS Event"},
             pre{{_id{"event_test"}}},
