@@ -75,6 +75,19 @@
                         const str_ptr = copy_string_null(instance, document.getElementById(id)[property]);
                         return str_ptr;
                     },
+                    add_element: (parent_ptr, parent_len, tag_ptr, tag_len, id_ptr, id_len) => {
+                        const parent = get_string(instance, parent_ptr, parent_len);
+                        const tag = get_string(instance, tag_ptr, tag_len);
+                        const id = get_string(instance, id_ptr, id_len);
+                        const element = document.createElement(tag);
+                        element.id = id;
+                        document.getElementById(parent).appendChild(element);
+                    },
+                    remove_element: (id_ptr, id_len) => {
+                        const id = get_string(instance, id_ptr, id_len);
+                        const element = document.getElementById(id);
+                        element.remove();
+                    },
                     log: (ptr, len) => {
                         console.log(get_string(instance, ptr, len));
                     },

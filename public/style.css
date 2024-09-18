@@ -93,7 +93,7 @@ ul.licenses {
 }
 .window hr {
     margin: 0;
-    flex-grow: 1;
+    flex-grow: 0;
     width: 100%;
 }
 .window.grabbed {
@@ -136,4 +136,16 @@ ul.licenses {
     margin: 10px;
     overflow: auto;
     padding-right: 1rem;
+}
+.window.minimized {
+    display: none;
+}
+.window.maximized {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
 }

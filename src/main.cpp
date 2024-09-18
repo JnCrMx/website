@@ -48,9 +48,9 @@ namespace windows {
             dv { {_id{id}, _class{"window"}},
                 dv { {_id{std::string{id}+"__titlebar"}, _class{"titlebar"}},
                     h3 {title},
-                    button { {_class{"minimize"}},"_"},
-                    button { {_class{"maximize"}},"□"},
-                    button { {_class{"close"}},"×"},
+                    button { {_id{std::string{id}+"__minimize"}, _class{"minimize"}},"_"},
+                    button { {_id{std::string{id}+"__maximize"}, _class{"maximize"}},"□"},
+                    button { {_id{std::string{id}+"__close"}, _class{"close"}},"×"},
                 },
                 hr{},
                 dv { {_class{"content"}},
@@ -171,10 +171,19 @@ void setup_window(std::string id, int initial_x, int initial_y) {
         grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
         grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
         grabbed_window = id;
-        web::set_property(id, "classList", "window grabbed");
+        web::add_class(id, "grabbed");
     }, false, true);
     web::add_event_listener(id, "mousedown", [id](std::string_view) {
         web::set_style_property(id, "zIndex", "{}", highest_z_index++);
+    });
+    web::add_event_listener(id+"__minimize", "click", [id](std::string_view) {
+        web::add_class(id, "minimized");
+    });
+    web::add_event_listener(id+"__maximize", "click", [id](std::string_view) {
+        web::toggle_class(id, "maximized");
+    });
+    web::add_event_listener(id+"__close", "click", [id](std::string_view) {
+        web::remove_element(id);
     });
     move_window(id, initial_x, initial_y);
 }
@@ -200,7 +209,7 @@ int main() {
     web::add_event_listener("__document__", "mouseup", [](std::string_view) {
         if(grabbed_window.empty())
             return;
-        web::set_property(grabbed_window, "classList", "window");
+        web::remove_class(grabbed_window, "grabbed");
         grabbed_window = "";
     });
     web::add_event_listener("__document__", "mousemove", [](std::string_view j) {
