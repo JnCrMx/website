@@ -86,6 +86,36 @@ namespace windows {
             },
             p{"Some of them are:"},
             ul{
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/discord-game-sdk4j"}, _target{"_blank"}}, h4{"discord-game-sdk4j"}},
+                    "Java bindings for Discord's Game SDK.<br>"
+                    "Now without using the native library and instead replicating the functionality entirely in pure Java."
+                }},
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/VulkanBot"}, _target{"_blank"}}, h4{"VulkanBot"}},
+                    "A Discord bot that can render models using custom Vulkan shaders and send the result as an image or video."
+                }},
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/cheeky-imp"}, _target{"_blank"}}, h4{"cheeky-imp"}},
+                    "A framework for hooking into Vulkan-based games for extracting and replacing shaders, texture and models.<br>"
+                    "It makes use of a self-made rule-based language for adding custom behaviour and has multiple plugins, such as:",
+                    ul{
+                        li{a{{_href{"https://github.com/JnCrMx/cheeky-companion"}, _target{"_blank"}}, "cheeky-companion"}, " for rendering and controlling additional models"},
+                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-imgui"}, _target{"_blank"}}, "cheeky-imgui"}, " for easily adding an ImGui overlay"},
+                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-input-x11"}, _target{"_blank"}}, "cheeky-input-x11"}, " for capturing input from X11 based applications"},
+                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-datahook"}, _target{"_blank"}}, "cheeky-datahook"}, " for extracting data from shaders"},
+                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-dbus"}, _target{"_blank"}}, "cheeky-dbus"}, " for interacting with D-Bus services"},
+                    }
+                }},
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/gpgfs"}, _target{"_blank"}}, h4{"gpgfs"}},
+                    "A FUSE filesystem that decrypts files on the access using GnuPG.<br>"
+                    "I mainly use it for keeping credential files encrypted at rest."
+                }},
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/chocobotpp"}, _target{"_blank"}}, h4{"chocobotpp"}},
+                    "A general purpose Discord bot written in C++, containing fun commands and mini-games."
+                }},
             },
         }
     };

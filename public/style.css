@@ -11,8 +11,10 @@ body{
         overflow: hidden;
     }
 }
-h1, h2, h3 {
+h1, h2, h3, h4, h5, h6 {
     line-height:1.2;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 h1 {
     text-align: center;
@@ -86,7 +88,7 @@ ul.licenses {
     background-color: #FFF;
 
     max-width: 50%;
-    max-height: 75%;
+    max-height: 50%;
     display: flex;
     flex-direction: column;
     flex: 1;
