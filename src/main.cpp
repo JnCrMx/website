@@ -25,17 +25,25 @@ namespace files {
         #embed ".git/logs/HEAD"
     };
 
+    namespace arrays {
+        constexpr auto src_main = std::to_array(::files::src_main);
+
+        constexpr auto git_log = std::to_array(::files::git_log);
+        constexpr auto git_commit_hash = [](){
+            constexpr std::string_view sv{::files::git_log, sizeof(::files::git_log)};
+            constexpr auto pos1 = sv.find_last_of('\n');
+            constexpr auto pos2 = sv.find_last_of('\n', pos1-1);
+            constexpr auto pos3 = sv.find(' ', pos2);
+
+            return utils::substr<git_log, pos3+1, 40>();
+        }();
+    }
     namespace views {
         constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
         constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
-
-        constexpr std::string_view git_log{::files::git_log, sizeof(::files::git_log)};
-        constexpr std::string_view git_commit_hash = git_log.substr(
-            git_log.find(' ', git_log.find_last_of('\n', git_log.find_last_of('\n')-1))+1, 40);
+        
+        constexpr std::string_view git_commit_hash{::files::arrays::git_commit_hash.data(), ::files::arrays::git_commit_hash.size()};
         constexpr std::string_view git_short_commit_hash = git_commit_hash.substr(0, 7);
-    }
-    namespace arrays {
-        constexpr auto src_main = std::to_array(::files::src_main);
     }
 }
 

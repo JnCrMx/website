@@ -8,6 +8,13 @@ export module utils;
 
 namespace utils {
 
+export template<std::array src, size_t start, size_t length>
+constexpr auto substr() {
+    std::array<char, length> result{};
+    std::copy(src.begin() + start, src.begin() + start + length, result.begin());
+    return result;
+}
+
 export template<std::array str, std::array from, std::array to>
 constexpr auto replace_sub_str() {
     constexpr std::string_view sv{str.data(), str.size()};
