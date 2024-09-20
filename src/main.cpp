@@ -33,9 +33,10 @@ namespace files {
             constexpr std::string_view sv{::files::git_log, sizeof(::files::git_log)};
             constexpr auto pos1 = sv.find_last_of('\n');
             constexpr auto pos2 = sv.find_last_of('\n', pos1-1);
-            constexpr auto pos3 = sv.find(' ', pos2);
+            constexpr auto pos3 = pos2 == std::string_view::npos ? 0 : pos2; // the file might have only one line
+            constexpr auto pos4 = sv.find(' ', pos3);
 
-            return utils::substr<git_log, pos3+1, 40>();
+            return utils::substr<git_log, pos4+1, 40>();
         }();
     }
     namespace views {
