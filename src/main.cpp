@@ -21,9 +21,18 @@ namespace files {
         #embed "build/_deps/json-src/LICENSE.MIT"
     };
 
+    constexpr char git_log[] = {
+        #embed ".git/logs/HEAD"
+    };
+
     namespace views {
         constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
         constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
+
+        constexpr std::string_view git_log{::files::git_log, sizeof(::files::git_log)};
+        constexpr std::string_view git_commit_hash = git_log.substr(
+            git_log.find(' ', git_log.find_last_of('\n', git_log.find_last_of('\n')-1))+1, 40);
+        constexpr std::string_view git_short_commit_hash = git_commit_hash.substr(0, 7);
     }
     namespace arrays {
         constexpr auto src_main = std::to_array(::files::src_main);
@@ -152,8 +161,8 @@ namespace windows {
     const Window build_info{"build_info", "Build Info",
         fragment{
             std::format(
-                "Built on {} at {} with {} version {}.{}.{}.",
-                __DATE__, __TIME__, utils::cxx_compiler_name,
+                "Built from commit {} on {} at {} with {} version {}.{}.{}.",
+                files::views::git_short_commit_hash, __DATE__, __TIME__, utils::cxx_compiler_name,
                 utils::cxx_compiler_version_major, utils::cxx_compiler_version_minor, utils::cxx_compiler_version_patch
             )
         }
