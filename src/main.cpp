@@ -141,7 +141,7 @@ namespace windows {
         fragment{
             p{
                 "This website is mostly written in C++ 23 using WASM and the ", code{"webxx"}, " library.<br>",
-                "It is compiled with ", code{"clang"}, " and ", code{"lld"}, " (version 20) and built with ", code{"CMake"}, ".<br>",
+                "It is compiled with ", code{"clang++"}, " and ", code{"lld"}, " (version 20) and built with ", code{"CMake"}, ".<br>",
                 "To provide a (more or less complete) standard library, ", code{"libc++-wasm32"} , " is used.<br>",
                 "It is using C++ named modules and coroutines just for fun and to test how well these modern features work already ", i{"(quite well!)"}, ".<br>",
                 "Interaction with the DOM and other browser APIs is done with self-made bindings (the ", code{"web"}, " and ", code{"web_coro"}, " modules).<br>",
