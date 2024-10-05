@@ -134,6 +134,10 @@ namespace windows {
                     a{{_href{"https://github.com/JnCrMx/chocobotpp"}, _target{"_blank"}}, h4{"chocobotpp"}},
                     "A general purpose Discord bot written in C++, containing fun commands and mini-games."
                 }},
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/cpp-snippets"}, _target{"_blank"}}, h4{"cpp-snippets"}},
+                    "A collection of useful C++ snippets."
+                }},
             },
         }
     };
