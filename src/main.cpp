@@ -138,6 +138,10 @@ namespace windows {
                     a{{_href{"https://github.com/JnCrMx/cpp-snippets"}, _target{"_blank"}}, h4{"cpp-snippets"}},
                     "A collection of useful C++ snippets."
                 }},
+                li{p{
+                    a{{_href{"https://github.com/JnCrMx/dreamrender"}, _target{"_blank"}}, h4{"dreamrender"}},
+                    "A simple Vulkan-based modern C++ render library used in some of my projects."
+                }},
             },
         }
     };
