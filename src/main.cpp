@@ -250,7 +250,7 @@ void setup_window(std::string id, int initial_x, int initial_y) {
 }
 
 [[clang::export_name("main")]]
-int main() {
+int my_main() {
     web::log("Hello World!");
 
     std::string hash = web::eval("location.hash");
