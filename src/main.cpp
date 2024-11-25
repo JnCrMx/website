@@ -42,7 +42,7 @@ namespace files {
     namespace views {
         constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
         constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
-        
+
         constexpr std::string_view git_commit_hash{::files::arrays::git_commit_hash.data(), ::files::arrays::git_commit_hash.size()};
         constexpr std::string_view git_short_commit_hash = git_commit_hash.substr(0, 7);
     }
@@ -110,6 +110,11 @@ namespace windows {
                     "Now without using the native library and instead replicating the functionality entirely in pure Java."
                 }},
                 li{p{
+                    a{{_href{"https://github.com/JnCrMx/cpp-toy-os"}, _target{"_blank"}}, h4{"cpp-toy-os"}},
+                    "An operating system kernel for ARM written in modern C++, using coroutines.<br>"
+                    "It is mostly a playground to try out how well certain modern features work in a freestanding environment (the answer is: pretty well)."
+                }},
+                li{p{
                     a{{_href{"https://github.com/JnCrMx/VulkanBot"}, _target{"_blank"}}, h4{"VulkanBot"}},
                     "A Discord bot that can render models using custom Vulkan shaders and send the result as an image or video."
                 }},
@@ -145,7 +150,7 @@ namespace windows {
             },
         }
     };
-    const Window source_code{"source_code", "Source Code", 
+    const Window source_code{"source_code", "Source Code",
         fragment{
             p{
                 "This website is mostly written in C++ 23 using WASM and the ", code{"webxx"}, " library.<br>",
