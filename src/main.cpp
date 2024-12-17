@@ -110,6 +110,14 @@ namespace windows {
                     "Now without using the native library and instead replicating the functionality entirely in pure Java."
                 }},
                 li{p{
+                    a{{_href{"https://github.com/JnCrMx/xmbshell"}, _target{"_blank"}}, h4{"xmbshell"}},
+                    "A desktop shell mimicing the look and functionality of the XrossMediaBar.<br>",
+                    "It is written in C++ and uses Vulkan (with a ",
+                    a{{_href{"https://github.com/JnCrMx/dreamrender"}, _target{"_blank"}}, "self-written mini-framework"},
+                    ") for rendering and ",
+                    code{"glibmm"},"&amp;",code{"giomm"}," for everything else."
+                }},
+                li{p{
                     a{{_href{"https://github.com/JnCrMx/cpp-toy-os"}, _target{"_blank"}}, h4{"cpp-toy-os"}},
                     "An operating system kernel for ARM written in modern C++, using coroutines.<br>"
                     "It is mostly a playground to try out how well certain modern features work in a freestanding environment (the answer is: pretty well)."
