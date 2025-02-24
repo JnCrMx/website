@@ -82,7 +82,7 @@ namespace windows {
         fragment{
             h1{"JCM"},
             p{"I'm a software developer and computer engineering student."},
-            dv{{_class{"socials"}},
+            p{{_class{"socials"}},
                 a{{_href{"https://github.com/JnCrMx/"}, _target{"_blank"}},
                     img{{_src{"https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"}, _title{"GitHub"}}}},
                 a{{_href{"https://git.jcm.re/jcm/"}, _target{"_blank"}},
@@ -91,7 +91,8 @@ namespace windows {
                     img{{_src{"https://files.jcm.re/blog_icon.png"}, _title{"Blog"}}}},
                 a{{_href{"https://keys.openpgp.org/vks/v1/by-fingerprint/7B839F0DA64069DD7832BB802F536DE3E9EC3AD8"}, _target{"_blank"}},
                     img{{_src{"https://www.openpgp.org/images/apple-touch-icon.png"}, _title{"OpenPGP"}}}},
-            }
+            },
+            p{"P.S.: I love Cyndi~! 🩷🩵"},
         }
     };
     const Window projects{"projects", "Projects",
