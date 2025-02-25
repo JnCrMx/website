@@ -16,6 +16,7 @@ namespace web {
     [[clang::import_name("get_property")]] char* get_property(const char* id, size_t id_len, const char* prop, size_t prop_len);
     [[clang::import_name("set_style_property")]] void set_style_property(const char* id, size_t id_len, const char* style, size_t style_len, const char* value, size_t value_len);
     [[clang::import_name("add_element")]] void add_element(const char* parent, size_t parent_len, const char* tag, size_t tag_len, const char* id, size_t id_len);
+    [[clang::import_name("add_element_html")]] void add_element_html(const char* parent, size_t parent_len, const char* html, size_t html_len);
     [[clang::import_name("remove_element")]] void remove_element(const char* id, size_t id_len);
     [[clang::import_name("log")]] void log(const char* message, size_t len);
     [[clang::import_name("add_event_listener")]] void add_event_listener(const char* id, size_t id_len, const char* event, size_t event_len, void* callback_data, bool once, bool prevent_default);
@@ -120,6 +121,11 @@ namespace web {
         }
         set_property(id, "classList", join_classes(class_set));
     }
+    export bool has_class(std::string_view id, std::string_view class_name) {
+        std::string classes = get_property(id, "classList");
+        auto class_set = parse_classes(classes);
+        return class_set.contains(std::string{class_name});
+    }
 
     export void set_style_property(std::string_view id, std::string_view property, std::string_view value) {
         set_style_property(id.data(), id.size(), property.data(), property.size(), value.data(), value.size());
@@ -133,14 +139,19 @@ namespace web {
     export void add_element(std::string_view parent, std::string_view tag, std::string_view id) {
         add_element(parent.data(), parent.size(), tag.data(), tag.size(), id.data(), id.size());
     }
-    export void add_element(std::string_view parent, std::string_view tag, std::string_view id, std::string_view inner_html) {
-        add_element(parent.data(), parent.size(), tag.data(), tag.size(), id.data(), id.size());
-        set_html(id, inner_html);
-    }
     export template<class... Args>
     void add_element(std::string_view parent, std::string_view tag, std::string_view id, std::format_string<Args...> inner_html, Args&&... args) {
         add_element(parent.data(), parent.size(), tag.data(), tag.size(), id.data(), id.size());
         set_html(id, inner_html, std::forward<Args>(args)...);
+    }
+
+    export void add_element_html(std::string_view parent, std::string_view html) {
+        add_element_html(parent.data(), parent.size(), html.data(), html.size());
+    }
+    export template<class... Args>
+    void add_element_html(std::string_view parent, std::format_string<Args...> html, Args&&... args) {
+        std::string s = std::format(html, std::forward<Args>(args)...);
+        add_element_html(parent.data(), parent.size(), s.data(), s.size());
     }
 
     export void remove_element(std::string_view id) {

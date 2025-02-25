@@ -1,6 +1,9 @@
 #include <array>
+#include <chrono>
 #include <coroutine> // IWYU pragma: keep
 #include <format>
+#include <functional>
+#include <random>
 #include <string>
 #include <string_view>
 
@@ -59,27 +62,161 @@ constexpr auto src_main_sanitised_array = [](){
 }();
 constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
 
+class Window {
+public:
+    constexpr Window(std::string&& id, std::string&& title, std::add_pointer_t<Webxx::fragment()> content) :
+        id(id), m_title(title), m_content(content) {}
+    const std::string id;
+
+    auto render_window() {
+        using namespace Webxx;
+        return dv { {_id{id}, _class{"window"}},
+            dv { {_id{std::string{id}+"__titlebar"}, _class{"titlebar"}},
+                h3 {m_title},
+                button { {_id{std::string{id}+"__minimize"}, _class{"minimize"}},"_"},
+                button { {_id{std::string{id}+"__maximize"}, _class{"maximize"}},"□"},
+                button { {_id{std::string{id}+"__close"}, _class{"close"}},"×"},
+            },
+            hr{},
+            dv { {_class{"content"}},
+                m_content()
+            }
+        };
+    }
+
+    void setup(int initial_x, int initial_y) {
+        web::add_event_listener(id+"__titlebar", "mousedown", [this](std::string_view j) {
+            nlohmann::json json = nlohmann::json::parse(j);
+            if(json["button"] != 0)
+                return;
+            int offsetLeft = web::get_property_int(id, "offsetLeft");
+            int offsetTop = web::get_property_int(id, "offsetTop");
+            grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
+            grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
+            grabbed_window = this;
+            web::add_class(id, "grabbed");
+        }, false, true);
+        web::add_event_listener(id, "mousedown", [this](std::string_view) {
+            bring_to_front();
+        });
+        web::add_event_listener(id+"__minimize", "click", [this](std::string_view) {
+            minimize();
+        });
+        web::add_event_listener(id+"__maximize", "click", [this](std::string_view) {
+            toggle_maximize();
+        });
+        web::add_event_listener(id+"__close", "click", [this](std::string_view) {
+            close();
+        });
+        move(initial_x, initial_y);
+    }
+    void bring_to_front() {
+        web::set_style_property(id, "zIndex", "{}", highest_z_index++);
+        if(on_focus) { on_focus(); }
+    }
+    void minimize() {
+        web::add_class(id, "minimized");
+        if(on_minimize) { on_minimize(true); }
+    }
+    void toggle_minimize() {
+        web::toggle_class(id, "minimized");
+        if(on_minimize) { on_minimize(web::has_class(id, "minimized")); }
+    }
+    void maximize() {
+        web::add_class(id, "maximized");
+        if(on_maximize) { on_maximize(true); }
+    }
+    void toggle_maximize() {
+        web::toggle_class(id, "maximized");
+        if(on_maximize) { on_maximize(web::has_class(id, "maximized")); }
+    }
+    void restore() {
+        web::remove_class(id, "minimized");
+        web::remove_class(id, "maximized");
+        if(on_restore) { on_restore(); }
+    }
+    void move(int x, int y) {
+        web::set_style_property(id, "left", "{}px", x);
+        web::set_style_property(id, "top", "{}px", y);
+        m_x = x;
+        m_y = y;
+        if(on_move) { on_move(m_x, m_y); }
+    }
+    void close() {
+        web::remove_element(id);
+        m_open = false;
+        if(on_close) { on_close(); }
+    }
+
+    [[nodiscard("This is a coroutine, you must either co_await or submit it.")]]
+    auto open() {
+        return open(m_x, m_y);
+    }
+
+    [[nodiscard("This is a coroutine, you must either co_await or submit it.")]]
+    auto open(int initial_x, int initial_y) -> web::coro::coroutine<void> {
+        std::string html = Webxx::render(render_window());
+        web::add_element_html("main", html);
+        co_await web::coro::next_tick();
+        setup(initial_x, initial_y);
+        m_open = true;
+        co_return;
+    }
+
+    bool is_open() const {
+        return m_open;
+    }
+    int get_x() const {
+        return m_x;
+    }
+    int get_y() const {
+        return m_y;
+    }
+
+    std::function<void()> on_focus;
+    std::function<void()> on_close;
+    std::function<void(bool)> on_minimize;
+    std::function<void(bool)> on_maximize;
+    std::function<void()> on_restore;
+    std::function<void(int, int)> on_move;
+
+    static void setup() {
+        web::add_event_listener("__document__", "mouseup", global_mouseup);
+        web::add_event_listener("__document__", "mousemove", global_mousemove);
+    }
+
+private:
+    std::string m_title;
+    std::add_pointer_t<Webxx::fragment()> m_content;
+    bool m_open = true;
+    int m_x = 0;
+    int m_y = 0;
+
+    static inline int highest_z_index = 1;
+    static inline int grab_start_x = 0;
+    static inline int grab_start_y = 0;
+    static inline struct Window* grabbed_window = nullptr;
+    static void global_mouseup(std::string_view) {
+        if(!grabbed_window)
+            return;
+        web::remove_class(grabbed_window->id, "grabbed");
+        grabbed_window = nullptr;
+    }
+    static void global_mousemove(std::string_view j) {
+        if(!grabbed_window)
+            return;
+        nlohmann::json json = nlohmann::json::parse(j);
+        int y = static_cast<int>(json["clientY"]) - grab_start_y;
+        int x = static_cast<int>(json["clientX"]) - grab_start_x;
+        grabbed_window->move(x, y);
+    }
+};
+
 namespace windows {
     using namespace Webxx;
-    struct Window : component<Window> {
-        constexpr Window(std::string_view id, std::string_view title, fragment&& content) : component<Window>{
-            dv { {_id{id}, _class{"window"}},
-                dv { {_id{std::string{id}+"__titlebar"}, _class{"titlebar"}},
-                    h3 {title},
-                    button { {_id{std::string{id}+"__minimize"}, _class{"minimize"}},"_"},
-                    button { {_id{std::string{id}+"__maximize"}, _class{"maximize"}},"□"},
-                    button { {_id{std::string{id}+"__close"}, _class{"close"}},"×"},
-                },
-                hr{},
-                dv { {_class{"content"}},
-                    std::move(content)
-                }
-            }
-        } {}
-    };
 
-    const Window about_me{"about_me", "About Me",
-        fragment{
+    Window about_me{"about_me", "About Me", [](){
+        return fragment{
             h1{"JCM"},
             p{"I'm a software developer and computer engineering student."},
             p{{_class{"socials"}},
@@ -93,10 +230,10 @@ namespace windows {
                     img{{_src{"https://www.openpgp.org/images/apple-touch-icon.png"}, _title{"OpenPGP"}}}},
             },
             p{"P.S.: I love Cyndi~! 🩷🩵"},
-        }
-    };
-    const Window projects{"projects", "Projects",
-        fragment{
+        };
+    }};
+    Window projects{"projects", "Projects", [](){
+        return fragment{
             p{
                 "I have plenty of public projects!<br>",
                 "Some of them are hosted on ", a{{_href{"https://github.com/JnCrMx/"}, _target{"_blank"}}, "GitHub"},
@@ -157,10 +294,10 @@ namespace windows {
                     "A simple Vulkan-based modern C++ render library used in some of my projects."
                 }},
             },
-        }
-    };
-    const Window source_code{"source_code", "Source Code",
-        fragment{
+        };
+    }};
+    Window source_code{"source_code", "Source Code", [](){
+        return fragment{
             p{
                 "This website is mostly written in C++ 23 using WASM and the ", code{"webxx"}, " library.<br>",
                 "It is compiled with ", code{"clang++"}, " and ", code{"lld"}, " (version 20) and built with ", code{"CMake"}, ".<br>",
@@ -173,10 +310,10 @@ namespace windows {
                 summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
                 pre{src_main_sanitised},
             },
-        }
-    };
-    const Window licenses{"licenses", "Licenses",
-        fragment{
+        };
+    }};
+    Window licenses{"licenses", "Licenses", [](){
+        return fragment{
             ul{ {_class{"licenses"}},
                 li{details{
                     summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
@@ -187,109 +324,105 @@ namespace windows {
                     pre{files::views::json_license},
                 }},
             },
-        }
-    };
-    const Window build_info{"build_info", "Build Info",
-        fragment{
+        };
+    }};
+    Window build_info{"build_info", "Build Info", [](){
+        return fragment{
             std::format(
                 "Built from commit {} on {} at {} with {} version {}.{}.{}.",
                 files::views::git_short_commit_hash, __DATE__, __TIME__, utils::cxx_compiler_name,
                 utils::cxx_compiler_version_major, utils::cxx_compiler_version_minor, utils::cxx_compiler_version_patch
             )
-        }
-    };
-    const Window cyndi{"cyndi", "Cyndi",
-        fragment{
+        };
+    }};
+    Window cyndi{"cyndi", "Cyndi", [](){
+        return fragment{
             h1{"I love you 🩷"},
             dv{{_id{"secret_content"}},
                 input{{_id{"secret_password"}, _type{"password"}, _placeholder{"Password"}}},
                 button{{_id{"secret_submit"}}, "💌"},
             },
-        }
-    };
+        };
+    }};
 }
 
-auto page(bool cyndi) {
+auto page() {
     using namespace Webxx;
     return fragment{
         h1{"Hello from JCM!"},
-        windows::about_me,
-        windows::projects,
-        windows::source_code,
-        windows::licenses,
-        windows::build_info,
-        maybe(cyndi, [](){return windows::cyndi;}),
+        dv{{_id{"close_message"}}},
     };
-}
-void move_window(std::string_view id, int x, int y) {
-    web::set_style_property(id, "left", "{}px", x);
-    web::set_style_property(id, "top", "{}px", y);
-}
-
-int highest_z_index = 1;
-int grab_start_x = 0;
-int grab_start_y = 0;
-std::string grabbed_window = "";
-
-void setup_window(std::string id, int initial_x, int initial_y) {
-    web::add_event_listener(id+"__titlebar", "mousedown", [id](std::string_view j) {
-        nlohmann::json json = nlohmann::json::parse(j);
-        if(json["button"] != 0)
-            return;
-        int offsetLeft = web::get_property_int(id, "offsetLeft");
-        int offsetTop = web::get_property_int(id, "offsetTop");
-        grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
-        grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
-        grabbed_window = id;
-        web::add_class(id, "grabbed");
-    }, false, true);
-    web::add_event_listener(id, "mousedown", [id](std::string_view) {
-        web::set_style_property(id, "zIndex", "{}", highest_z_index++);
-    });
-    web::add_event_listener(id+"__minimize", "click", [id](std::string_view) {
-        web::add_class(id, "minimized");
-    });
-    web::add_event_listener(id+"__maximize", "click", [id](std::string_view) {
-        web::toggle_class(id, "maximized");
-    });
-    web::add_event_listener(id+"__close", "click", [id](std::string_view) {
-        web::remove_element(id);
-    });
-    move_window(id, initial_x, initial_y);
 }
 
 [[clang::export_name("main")]]
 int my_main() {
     web::log("Hello World!");
+    web::set_html("main", Webxx::render(page()));
 
     std::string hash = web::eval("location.hash");
     bool cyndi = hash == "#cyndi";
 
-    web::set_html("main", Webxx::render(page(cyndi)));
+    Window::setup();
+    web::coro::submit([cyndi]()->web::coro::coroutine<void> {
+        co_await web::coro::when_all(
+            windows::about_me.open(75, 50),
+            windows::projects.open(800, 100),
+            windows::source_code.open(700, 500),
+            windows::licenses.open(100, 550),
+            windows::build_info.open(50, 800)
+        );
+        if(cyndi) {
+            co_await windows::cyndi.open(400, 300);
+        }
+        co_return;
+    }());
 
-    setup_window("about_me", 75, 50);
-    setup_window("projects", 800, 100);
-    setup_window("source_code", 700, 500);
-    setup_window("licenses", 100, 550);
-    setup_window("build_info", 50, 800);
-    if(cyndi) {
-        setup_window("cyndi", 400, 300);
+    auto close_handler = []() {
+        if(!windows::about_me.is_open() && !windows::projects.is_open() && !windows::source_code.is_open() && !windows::licenses.is_open() && !windows::build_info.is_open()) {
+            using namespace Webxx;
+            web::set_html("close_message", render(fragment{
+                h2{"You closed all windows!"},
+                button{{_id{"reopen_button"}}, "Reopen them all~!"}
+            }));
+            using namespace web::coro;
+            submit([]()->coroutine<void> {
+                co_await next_tick();
+                co_await event{"reopen_button", "click"};
+
+                constexpr std::array messages = {
+                    "Are you sure? ;)",
+                    "Why did you close them all before then?",
+                    "Baka baka b-baaakaaa!",
+                };
+                static std::default_random_engine gen{std::random_device{}()};
+                static std::uniform_int_distribution<int> dist{0, messages.size()-1};
+                int last = -1;
+                for(int i=0; i<5-1; i++) {
+                    int r;
+                    do {
+                        r = dist(gen);
+                    } while(r == last);
+                    last = r;
+
+                    web::set_html("reopen_button", messages[r]);
+                    co_await event{"reopen_button", "click"};
+                }
+
+                web::set_html("close_message", "");
+                co_await web::coro::when_all(
+                    windows::about_me.open(75, 50),
+                    windows::projects.open(800, 100),
+                    windows::source_code.open(700, 500),
+                    windows::licenses.open(100, 550),
+                    windows::build_info.open(50, 800)
+                );
+                co_return;
+            }());
+        }
+    };
+    for(auto& w : {&windows::about_me, &windows::projects, &windows::source_code, &windows::licenses, &windows::build_info}) {
+        w->on_close = close_handler;
     }
-
-    web::add_event_listener("__document__", "mouseup", [](std::string_view) {
-        if(grabbed_window.empty())
-            return;
-        web::remove_class(grabbed_window, "grabbed");
-        grabbed_window = "";
-    });
-    web::add_event_listener("__document__", "mousemove", [](std::string_view j) {
-        if(grabbed_window.empty())
-            return;
-        nlohmann::json json = nlohmann::json::parse(j);
-        int y = static_cast<int>(json["clientY"]) - grab_start_y;
-        int x = static_cast<int>(json["clientX"]) - grab_start_x;
-        move_window(grabbed_window, x, y);
-    });
 
     using namespace web::coro;
     if(cyndi) {

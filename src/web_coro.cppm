@@ -33,8 +33,9 @@ struct coroutine : std::coroutine_handle<promise<Return>> {
     auto await_resume() {
         if constexpr (std::is_same_v<Return, void>) {
             return;
+        } else {
+            return this->promise().result;
         }
-        return this->promise().result;
     }
 };
 
@@ -85,6 +86,13 @@ struct promise<void> : promise_base<void>
     }
 };
 
+export template<typename... Returns>
+[[nodiscard("This is a coroutine, you must either co_await or submit it.")]]
+coroutine<void> when_all(coroutine<Returns>&&... coros) {
+    (co_await coros, ...);
+    co_return;
+}
+
 export template<typename Return>
 void submit(coroutine<Return>&& coro) {
     coro.resume();
@@ -106,6 +114,9 @@ export struct timeout {
     }
     void await_resume() const noexcept {}
 };
+export auto next_tick() {
+    return timeout{std::chrono::milliseconds{0}};
+}
 
 export struct event {
     std::string_view id;
