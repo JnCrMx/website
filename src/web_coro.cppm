@@ -98,6 +98,13 @@ void submit(coroutine<Return>&& coro) {
     coro.resume();
 }
 
+export template<typename Return>
+void submit_next(coroutine<Return>&& coro) {
+    web::set_timeout(std::chrono::milliseconds{0}, [coro = std::move(coro)](std::string_view) {
+        coro.resume();
+    });
+}
+
 export struct timeout {
     std::chrono::milliseconds duration;
     std::coroutine_handle<> handle;

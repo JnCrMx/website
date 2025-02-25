@@ -1,5 +1,4 @@
 #include <array>
-#include <chrono>
 #include <coroutine> // IWYU pragma: keep
 #include <format>
 #include <functional>
@@ -160,6 +159,7 @@ public:
         co_await web::coro::next_tick();
         setup(initial_x, initial_y);
         m_open = true;
+        if(on_open) { on_open(); }
         co_return;
     }
 
@@ -173,8 +173,9 @@ public:
         return m_y;
     }
 
-    std::function<void()> on_focus;
+    std::function<void()> on_open;
     std::function<void()> on_close;
+    std::function<void()> on_focus;
     std::function<void(bool)> on_minimize;
     std::function<void(bool)> on_maximize;
     std::function<void()> on_restore;
@@ -385,8 +386,7 @@ int my_main() {
                 button{{_id{"reopen_button"}}, "Reopen them all~!"}
             }));
             using namespace web::coro;
-            submit([]()->coroutine<void> {
-                co_await next_tick();
+            submit_next([]()->coroutine<void> {
                 co_await event{"reopen_button", "click"};
 
                 constexpr std::array messages = {
@@ -410,11 +410,11 @@ int my_main() {
 
                 web::set_html("close_message", "");
                 co_await web::coro::when_all(
-                    windows::about_me.open(75, 50),
-                    windows::projects.open(800, 100),
-                    windows::source_code.open(700, 500),
-                    windows::licenses.open(100, 550),
-                    windows::build_info.open(50, 800)
+                    windows::about_me.open(),
+                    windows::projects.open(),
+                    windows::source_code.open(),
+                    windows::licenses.open(),
+                    windows::build_info.open()
                 );
                 co_return;
             }());
@@ -425,7 +425,7 @@ int my_main() {
     }
 
     using namespace web::coro;
-    if(cyndi) {
+    windows::cyndi.on_open = []() {
         submit([]()->coroutine<void> {
             co_await event{"secret_submit", "click"};
             std::string password = web::get_property("secret_password", "value");
@@ -433,7 +433,7 @@ int my_main() {
             web::set_html("secret_content", res);
             co_return;
         }());
-    }
+    };
 
     return 0;
 }
