@@ -56,15 +56,80 @@ constexpr auto src_main_sanitised_array = [](){
 }();
 constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
 
+template<class... Args>
+struct ActionHandlerList {
+    using function_signature = void(Args...);
+    using function_type = std::function<function_signature>;
+    using ext_function_signature = void(ActionHandlerList<Args...>&, Args...);
+    using ext_function_type = std::function<ext_function_signature>;
+
+    std::list<ext_function_type> handlers;
+    decltype(handlers)::iterator current_handler;
+
+    void* operator+=(function_type&& handler) {
+        handlers.push_back([handler = std::move(handler)](ActionHandlerList<Args...>&, Args... args) {
+            handler(args...);
+        });
+        return &handlers.back();
+    }
+    void* operator+=(ext_function_type&& handler) {
+        handlers.push_back(std::move(handler));
+        return &handlers.back();
+    }
+
+    auto add_unique(function_type&& handler) {
+        return std::unique_ptr<void, std::function<void(void*)>>{*this += std::move(handler), [this](void* handler) {
+            remove(handler);
+        }};
+    }
+    auto add_unique(ext_function_type&& handler) {
+        return std::unique_ptr<void, std::function<void(void*)>>{*this += std::move(handler), [this](void* handler) {
+            remove(handler);
+        }};
+    }
+
+    void operator()(Args... args) {
+        for(current_handler = handlers.begin(); current_handler != handlers.end(); ++current_handler) {
+            (*current_handler)(*this, args...);
+        }
+    }
+    operator bool() const {
+        return !handlers.empty();
+    }
+    bool empty() const {
+        return handlers.empty();
+    }
+    void clear() {
+        handlers.clear();
+    }
+    void remove_current() {
+        if(current_handler != handlers.end()) {
+            current_handler = handlers.erase(current_handler++);
+        }
+    }
+    void remove(void* handler) {
+        auto it = std::find_if(handlers.begin(), handlers.end(), [handler](const auto& h) {
+            return &h == handler;
+        });
+        if(it != handlers.end()) {
+            if(it == current_handler) {
+                remove_current();
+            } else {
+                handlers.erase(it);
+            }
+        }
+    }
+};
+
 class Window {
 public:
     constexpr Window(std::string&& id, std::string&& title, std::add_pointer_t<Webxx::fragment()> content) :
         id(id), m_title(title), m_content(content) {}
     const std::string id;
 
-    auto render_window() {
+    auto render_window(int x = 0, int y = 0) {
         using namespace Webxx;
-        return dv { {_id{id}, _class{"window"}},
+        return dv { {_id{id}, _class{"window"}, _style{std::format("left:{}px;top:{}px", x, y)}},
             dv { {_id{std::string{id}+"__titlebar"}, _class{"titlebar"}},
                 h3 {m_title},
                 button { {_id{std::string{id}+"__minimize"}, _class{"minimize"}},"_"},
@@ -149,7 +214,7 @@ public:
 
     [[nodiscard("This is a coroutine, you must either co_await or submit it.")]]
     auto open(int initial_x, int initial_y) -> web::coro::coroutine<void> {
-        std::string html = Webxx::render(render_window());
+        std::string html = Webxx::render(render_window(initial_x, initial_y));
         web::add_element_html("main", html);
         co_await web::coro::next_tick();
         setup(initial_x, initial_y);
@@ -168,13 +233,13 @@ public:
         return m_y;
     }
 
-    std::function<void()> on_open;
-    std::function<void()> on_close;
-    std::function<void()> on_focus;
-    std::function<void(bool)> on_minimize;
-    std::function<void(bool)> on_maximize;
-    std::function<void()> on_restore;
-    std::function<void(int, int)> on_move;
+    ActionHandlerList<> on_open;
+    ActionHandlerList<> on_close;
+    ActionHandlerList<> on_focus;
+    ActionHandlerList<bool> on_minimize;
+    ActionHandlerList<bool> on_maximize;
+    ActionHandlerList<> on_restore;
+    ActionHandlerList<int, int> on_move;
 
     static void setup() {
         web::add_event_listener("__document__", "mouseup", global_mouseup);
@@ -184,7 +249,7 @@ public:
 private:
     std::string m_title;
     std::add_pointer_t<Webxx::fragment()> m_content;
-    bool m_open = true;
+    bool m_open = false;
     int m_x = 0;
     int m_y = 0;
 
@@ -349,12 +414,83 @@ namespace windows {
     }};
 }
 
+static std::array all_windows = {
+    &windows::about_me,
+    &windows::projects,
+    &windows::source_code,
+    &windows::licenses,
+    &windows::build_info,
+    &windows::c_interpreter,
+    &windows::cyndi,
+};
+
 auto page() {
     using namespace Webxx;
     return fragment{
         h1{"Hello from JCM!"},
         dv{{_id{"close_message"}}},
     };
+}
+
+static std::default_random_engine gen{std::random_device{}()};
+
+auto ganyu() -> web::coro::coroutine<void> {
+    using namespace Webxx;
+    static std::uniform_real_distribution<float> chance_dist{};
+    constexpr float ganyu_chance = 0.01f;
+    constexpr auto ganyu_duration = std::chrono::seconds{60};
+
+    while(true) {
+        co_await web::coro::timeout(std::chrono::seconds{1});
+        if(chance_dist(gen) > ganyu_chance) {
+            continue;
+        }
+
+        std::vector<Window*> open_windows;
+        for(auto& w : all_windows) {
+            if(w->is_open()) {
+                open_windows.push_back(w);
+            }
+        }
+        if(open_windows.empty()) {
+            continue;
+        }
+        std::uniform_int_distribution<int> window_dist(0, open_windows.size()-1);
+        auto target_window = open_windows[window_dist(gen)];
+
+        const int height = 50;
+        const int offset_x = 0;
+        const int offset_y = -height;
+
+        auto ganyu_elem = a{
+            {
+                _id{"ganyu"},
+                _href{"https://git.jcm.re/jcm/"},
+                _target{"_blank"},
+                _style{std::format("left: {}px; top: {}px;",
+                    target_window->get_x()+offset_x, target_window->get_y()+offset_y)}
+            },
+            img{{_src{"ganyu.png"}, _alt{"Ganyu"}, _height{std::to_string(height)}}}
+        };
+        web::add_element_html("main", Webxx::render(ganyu_elem));
+        auto ref1 = target_window->on_move.add_unique([offset_x, offset_y](int x, int y) {
+            web::set_style_property("ganyu", "left", "{}px", x+offset_x);
+            web::set_style_property("ganyu", "top", "{}px", y+offset_y);
+        });
+        bool window_closed = false;
+        auto ref2 = target_window->on_close.add_unique([&window_closed](){
+            window_closed = true;
+        });
+
+        constexpr auto tick = std::chrono::milliseconds{100};
+        for(unsigned int i=0; i<ganyu_duration/tick && !window_closed; i++) {
+            co_await web::coro::timeout(std::chrono::milliseconds{100});
+        }
+
+        web::remove_element("ganyu");
+    }
+
+    co_return;
 }
 
 [[clang::export_name("main")]]
@@ -372,8 +508,8 @@ int my_main() {
             windows::projects.open(800, 100),
             windows::source_code.open(700, 500),
             windows::licenses.open(100, 550),
-            windows::build_info.open(50, 800),
-            windows::c_interpreter.open(400, 100)
+            windows::build_info.open(50, 800)
+            //windows::c_interpreter.open(400, 100)
         );
         if(cyndi) {
             co_await windows::cyndi.open(400, 300);
@@ -382,7 +518,15 @@ int my_main() {
     }());
 
     auto close_handler = []() {
-        if(!windows::about_me.is_open() && !windows::projects.is_open() && !windows::source_code.is_open() && !windows::licenses.is_open() && !windows::build_info.is_open()) {
+        bool all_closed = true;
+        for(auto& w : all_windows) {
+            if(w->is_open()) {
+                all_closed = false;
+                break;
+            }
+        }
+
+        if(all_closed) {
             using namespace Webxx;
             web::set_html("close_message", render(fragment{
                 h2{"You closed all windows!"},
@@ -397,7 +541,6 @@ int my_main() {
                     "Why did you close them all before then?",
                     "Baka baka b-baaakaaa!",
                 };
-                static std::default_random_engine gen{std::random_device{}()};
                 static std::uniform_int_distribution<int> dist{0, messages.size()-1};
                 int last = -1;
                 for(int i=0; i<5-1; i++) {
@@ -417,19 +560,19 @@ int my_main() {
                     windows::projects.open(),
                     windows::source_code.open(),
                     windows::licenses.open(),
-                    windows::build_info.open(),
-                    windows::c_interpreter.open()
+                    windows::build_info.open()
+                    //windows::c_interpreter.open()
                 );
                 co_return;
             }());
         }
     };
-    for(auto& w : {&windows::about_me, &windows::projects, &windows::source_code, &windows::licenses, &windows::build_info}) {
-        w->on_close = close_handler;
+    for(auto& w : all_windows) {
+        w->on_close += close_handler;
     }
 
     using namespace web::coro;
-    windows::cyndi.on_open = []() {
+    windows::cyndi.on_open += []() {
         submit([]()->coroutine<void> {
             co_await event{"secret_submit", "click"};
             std::string password = web::get_property("secret_password", "value");
@@ -438,7 +581,7 @@ int my_main() {
             co_return;
         }());
     };
-    windows::c_interpreter.on_open = []() {
+    windows::c_interpreter.on_open += []() {
         web::add_event_listener("c_interpreter_submit", "click", [](std::string_view){
             std::string code = web::get_property("c_interpreter_input", "value");
             std::ostringstream output;
@@ -477,6 +620,7 @@ int my_main() {
             web::set_property("c_interpreter_output", "value", output.str());
         });
     };
+    web::coro::submit(ganyu());
 
     return 0;
 }
