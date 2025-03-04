@@ -2,15 +2,20 @@
 #include <coroutine> // IWYU pragma: keep
 #include <format>
 #include <functional>
+#include <iomanip>
 #include <random>
+#include <sstream>
 #include <string>
 #include <string_view>
+#include <variant>
 
 import web;
 import web_coro;
 import utils;
 import nlohmann_json;
 import webxx;
+
+import c_interpreter;
 
 namespace files {
     constexpr char src_main[] = { // secrets in this file will be optimized away :D
@@ -336,6 +341,13 @@ namespace windows {
             )
         };
     }};
+    Window c_interpreter{"c_interpreter", "C Interpreter", [](){
+        return fragment{
+            textarea{{_id{"c_interpreter_input"}, _placeholder{"Enter C code here..."}, _rows{"10"}, _cols{"80"}}},
+            button{{_id{"c_interpreter_submit"}}, "Run"},
+            textarea{{_id{"c_interpreter_output"}, _readonly{""}, _rows{"10"}, _cols{"80"}}},
+        };
+    }};
     Window cyndi{"cyndi", "Cyndi", [](){
         return fragment{
             h1{"I love you 🩷"},
@@ -370,7 +382,8 @@ int my_main() {
             windows::projects.open(800, 100),
             windows::source_code.open(700, 500),
             windows::licenses.open(100, 550),
-            windows::build_info.open(50, 800)
+            windows::build_info.open(50, 800),
+            windows::c_interpreter.open(400, 100)
         );
         if(cyndi) {
             co_await windows::cyndi.open(400, 300);
@@ -414,7 +427,8 @@ int my_main() {
                     windows::projects.open(),
                     windows::source_code.open(),
                     windows::licenses.open(),
-                    windows::build_info.open()
+                    windows::build_info.open(),
+                    windows::c_interpreter.open()
                 );
                 co_return;
             }());
@@ -433,6 +447,45 @@ int my_main() {
             web::set_html("secret_content", res);
             co_return;
         }());
+    };
+    windows::c_interpreter.on_open = []() {
+        web::add_event_listener("c_interpreter_submit", "click", [](std::string_view){
+            std::string code = web::get_property("c_interpreter_input", "value");
+            std::ostringstream output;
+
+            {
+                std::istringstream input{code};
+                c_interpreter::lexer<1> lex{input};
+
+                while(true) {
+                    auto t = lex.next();
+                    if(t.kind == c_interpreter::token_kind::EOF_)
+                        break;
+                    output << utils::enum_name(t.kind);
+                    std::visit([&output](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr(std::is_same_v<T, std::string>) {
+                            output << "[" << std::quoted(arg) << "]";
+                        } else if constexpr(!std::is_same_v<T, std::monostate>) {
+                            output << "[" << arg << "]";
+                        }
+                    }, t.value);
+                    output << " ";
+                }
+            }
+            output << "\n";
+            {
+                std::istringstream input{code};
+                c_interpreter::lexer<1> lex{input};
+                c_interpreter::parser parser{lex};
+                auto res = parser.parse_program();
+                if(!res) {
+                    output << "Parse error: " << res.error() << "\n";
+                }
+            }
+
+            web::set_property("c_interpreter_output", "value", output.str());
+        });
     };
 
     return 0;

@@ -10,6 +10,6 @@ void _initialize() {
 extern "C" {
 
 void* __cxa_allocate_exception(size_t) { __builtin_trap(); return nullptr; }
-void __cxa_throw(void *, void *, void (*) (void *)) { }
+void __cxa_throw(void *, void *, void (*) (void *)) { __builtin_trap(); }
 
 }

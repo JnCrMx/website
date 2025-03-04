@@ -46,6 +46,7 @@ set(MODULE_SOURCES
     src/web.cppm
     src/web_coro.cppm
     src/utils.cppm
+    src/c_interpreter.cppm
 )
 
 add_executable(website ${SOURCES})
