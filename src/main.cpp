@@ -1,14 +1,4 @@
-#include <array>
-#include <coroutine> // IWYU pragma: keep
-#include <format>
-#include <functional>
-#include <iomanip>
-#include <random>
-#include <sstream>
-#include <string>
-#include <string_view>
-#include <variant>
-
+import std;
 import web;
 import web_coro;
 import utils;

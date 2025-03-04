@@ -38,6 +38,15 @@ target_sources(jsonModule PUBLIC FILE_SET CXX_MODULES FILES third_party/json.cpp
 target_compile_features(jsonModule PUBLIC cxx_std_23)
 target_link_libraries(jsonModule PUBLIC nlohmann_json::nlohmann_json)
 
+add_library(stdModule STATIC)
+target_sources(stdModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS /usr/lib/llvm-19/share/libc++/v1/
+    FILES /usr/lib/llvm-19/share/libc++/v1/std.cppm)
+target_compile_features(stdModule PUBLIC cxx_std_23)
+# The standard library may use reserved identifiers
+target_compile_options(stdModule PRIVATE -Wno-reserved-identifier)
+# These two are not supported by WASI, so we just define their header guards, so they will be skipped
+target_compile_definitions(stdModule PRIVATE _LIBCPP_CSETJMP _LIBCPP_CSIGNAL)
+
 set(SOURCES
     src/main.cpp
     src/c++support.cpp
@@ -54,6 +63,6 @@ target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES ${MODULE_
 target_compile_features(website PRIVATE cxx_std_23)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
-target_link_libraries(website PRIVATE webxxModule jsonModule)
+target_link_libraries(website PRIVATE webxxModule jsonModule stdModule)
 target_compile_options(website PRIVATE --embed-dir=${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(website PRIVATE -Wno-c23-extensions)

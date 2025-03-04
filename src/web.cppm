@@ -1,15 +1,12 @@
 module;
 
-#include <chrono>
-#include <format>
-#include <functional>
-#include <set>
-#include <sstream>
-#include <string_view>
-
 export module web;
 
+import std;
+
 namespace web {
+    using std::size_t;
+
     [[clang::import_name("eval")]] char* eval(const char* code, size_t len);
     [[clang::import_name("set_html")]] void set_html(const char* id, size_t id_len, const char* html, size_t html_len);
     [[clang::import_name("set_property")]] void set_property(const char* id, size_t id_len, const char* prop, size_t prop_len, const char* value, size_t value_len);

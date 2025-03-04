@@ -1,14 +1,11 @@
 module;
 
-#include <algorithm>
-#include <array>
-#include <source_location>
-#include <string_view>
-#include <utility>
-
 export module utils;
 
+import std;
+
 namespace utils {
+using std::size_t;
 
 export template<std::array src, size_t start, size_t length>
 constexpr auto substr() {

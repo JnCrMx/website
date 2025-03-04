@@ -1,15 +1,8 @@
 module;
 
-#include <expected>
-#include <format>
-#include <iomanip>
-#include <istream>
-#include <string>
-#include <variant>
-#include <vector>
-
 export module c_interpreter;
 
+import std;
 import utils;
 
 namespace c_interpreter {
@@ -79,6 +72,7 @@ public:
 private:
     std::istream& m_input;
     std::array<token, Lookahead+1> m_buffer;
+    static constexpr auto EOF = std::string::traits_type::eof();
 
     token read() {
         while(true) {

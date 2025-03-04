@@ -1,11 +1,8 @@
 module;
 
-#include <coroutine>
-#include <chrono>
-#include <string_view>
-
 export module web_coro;
 
+import std;
 import web;
 
 namespace web::coro {
