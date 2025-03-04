@@ -18,11 +18,11 @@ steps:
         DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
         cmake git ca-certificates ninja-build
         clang-19 clang-tools-19 lld-19 llvm-19 wabt
-        libc++-19-dev-wasm32 libclang-rt-19-dev-wasm32
+        libc++-19-dev libc++-19-dev-wasm32 libclang-rt-19-dev-wasm32
       - mkdir build
       - >-
         cmake -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel
-        -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 
+        -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19
         -DCMAKE_C_COMPILER_AR=llvm-ar-19 -DCMAKE_CXX_COMPILER_AR=llvm-ar-19
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
