@@ -4,6 +4,7 @@ import web_coro;
 import utils;
 import nlohmann_json;
 import webxx;
+import tinyxml2;
 
 import c_interpreter;
 
@@ -16,6 +17,9 @@ namespace files {
     };
     constexpr char json_license[] = {
         #embed "build/_deps/json-src/LICENSE.MIT"
+    };
+    constexpr char tinyxml2_license[] = {
+        #embed "build/_deps/tinyxml2-src/LICENSE.txt"
     };
 
     constexpr char git_log[] = {
@@ -39,6 +43,7 @@ namespace files {
     namespace views {
         constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
         constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
+        constexpr std::string_view tinyxml2_license{::files::tinyxml2_license, sizeof(::files::tinyxml2_license)};
 
         constexpr std::string_view git_commit_hash{::files::arrays::git_commit_hash.data(), ::files::arrays::git_commit_hash.size()};
         constexpr std::string_view git_short_commit_hash = git_commit_hash.substr(0, 7);
@@ -433,6 +438,11 @@ namespace windows {
             },
         };
     }};
+    Window blog{"blog", "Blog", [](){
+        return fragment{
+            dv{{_id{"blog_container"}}}
+        };
+    }};
     Window source_code{"source_code", "Source Code", [](){
         return fragment{
             p{
@@ -459,6 +469,10 @@ namespace windows {
                 li{details{
                     summary{a{{_href{"https://github.com/nlohmann/json"}, _target{"_blank"}}, code{"nlohmann::json"}}},
                     pre{files::views::json_license},
+                }},
+                li{details{
+                    summary{a{{_href{"https://github.com/leethomason/tinyxml2"}, _target{"_blank"}}, code{"TinyXML-2"}}},
+                    pre{files::views::tinyxml2_license},
                 }},
             },
         };
@@ -496,6 +510,7 @@ namespace windows {
 static std::array all_windows = {
     &windows::about_me,
     &windows::projects,
+    &windows::blog,
     &windows::source_code,
     &windows::licenses,
     &windows::build_info,
@@ -588,9 +603,10 @@ int my_main() {
     Window::setup();
     web::coro::submit([cyndi]()->web::coro::coroutine<void> {
         co_await web::coro::when_all(
+            windows::blog.open(400, 450),
             windows::about_me.open(75, 50),
             windows::projects.open(800, 100),
-            windows::source_code.open(700, 500),
+            windows::source_code.open(900, 500),
             windows::licenses.open(100, 550),
             windows::build_info.open(50, 800)
             //windows::c_interpreter.open(400, 100)
@@ -640,6 +656,7 @@ int my_main() {
 
                 web::set_html("close_message", "");
                 co_await web::coro::when_all(
+                    windows::blog.open(),
                     windows::about_me.open(),
                     windows::projects.open(),
                     windows::source_code.open(),
@@ -656,6 +673,29 @@ int my_main() {
     }
 
     using namespace web::coro;
+    windows::blog.on_open += []() {
+        submit([]()->coroutine<void> {
+            std::string xml = co_await fetch("https://files.jcm.re/blog.xml");
+            tinyxml2::XMLDocument doc;
+            doc.Parse(xml.data(), xml.size());
+            tinyxml2::XMLElement* root = doc.FirstChildElement("rss");
+            tinyxml2::XMLElement* channel = root->FirstChildElement("channel");
+            for(tinyxml2::XMLElement* item = channel->FirstChildElement("item"); item; item = item->NextSiblingElement("item")) {
+                std::string title = item->FirstChildElement("title")->GetText();
+                std::string link = item->FirstChildElement("link")->GetText();
+                std::string pubDate = item->FirstChildElement("pubDate")->GetText();
+                std::string description = item->FirstChildElement("description")->GetText();
+                using namespace Webxx;
+                web::add_element_html("blog_container", render(fragment{
+                    h2{a{{_href{link}, _target{"_blank"}}, title}},
+                    p{i{pubDate}},
+                    p{description},
+                    hr{},
+                }));
+            }
+            co_return;
+        }());
+    };
     windows::cyndi.on_open += []() {
         submit([]()->coroutine<void> {
             co_await event{"secret_submit", "click"};

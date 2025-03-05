@@ -26,7 +26,12 @@ FetchContent_Declare(webxx
     GIT_TAG v0.9.2
 )
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
-FetchContent_MakeAvailable(webxx json)
+FetchCOntent_Declare(tinyxml2
+    GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
+    GIT_TAG v10.0.0)
+
+set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(webxx json tinyxml2)
 
 add_library(webxxModule STATIC)
 target_sources(webxxModule PUBLIC FILE_SET CXX_MODULES FILES third_party/webxx.cppm)
@@ -37,6 +42,11 @@ add_library(jsonModule STATIC)
 target_sources(jsonModule PUBLIC FILE_SET CXX_MODULES FILES third_party/json.cppm)
 target_compile_features(jsonModule PUBLIC cxx_std_26)
 target_link_libraries(jsonModule PUBLIC nlohmann_json::nlohmann_json)
+
+add_library(tinyxml2Module STATIC)
+target_sources(tinyxml2Module PUBLIC FILE_SET CXX_MODULES FILES third_party/tinyxml2.cppm)
+target_compile_features(tinyxml2Module PUBLIC cxx_std_26)
+target_link_libraries(tinyxml2Module PUBLIC tinyxml2::tinyxml2)
 
 add_library(stdModule STATIC)
 target_sources(stdModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS /usr/lib/llvm-19/share/libc++/v1/
@@ -63,6 +73,6 @@ target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES ${MODULE_
 target_compile_features(website PRIVATE cxx_std_26)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
-target_link_libraries(website PRIVATE webxxModule jsonModule stdModule)
+target_link_libraries(website PRIVATE stdModule webxxModule jsonModule tinyxml2Module)
 target_compile_options(website PRIVATE --embed-dir=${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(website PRIVATE -Wno-c23-extensions)
