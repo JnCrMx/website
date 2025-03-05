@@ -372,8 +372,7 @@ namespace windows {
                      {LinkType::CI, "https://woodpecker.jcm.re/repos/22"}},
                     fragment{
                         b{"This very website you are visiting right now!"}, "<br>"
-                        "It is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library."
-                        "See the \"Source Code\" window for more information."
+                        "It is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library. Look at the \"Source Code\" window for more information."
                 }},
                 Project{"cpp-toy-os", "https://github.com/JnCrMx/cpp-toy-os",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-toy-os"},
