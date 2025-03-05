@@ -601,7 +601,7 @@ int my_main() {
     bool cyndi = hash == "#cyndi";
 
     Window::setup();
-    web::coro::submit([cyndi]()->web::coro::coroutine<void> {
+    web::coro::submit([](bool cyndi)->web::coro::coroutine<void> {
         co_await web::coro::when_all(
             windows::blog.open(400, 450),
             windows::about_me.open(75, 50),
@@ -612,10 +612,10 @@ int my_main() {
             //windows::c_interpreter.open(400, 100)
         );
         if(cyndi) {
-            co_await windows::cyndi.open(400, 300);
+            co_await windows::cyndi.open(500, 250);
         }
         co_return;
-    }());
+    }(cyndi));
 
     auto close_handler = []() {
         bool all_closed = true;
