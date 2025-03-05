@@ -11,7 +11,7 @@ variables:
 
 steps:
   build:
-    image: ubuntu:noble
+    image: ubuntu:rolling
     commands:
       - apt-get update
       - >-
