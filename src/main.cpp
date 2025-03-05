@@ -294,6 +294,50 @@ namespace windows {
         };
     }};
     Window projects{"projects", "Projects", [](){
+        enum class LinkType {
+            GitHub,
+            GitHug,
+            Docs,
+            CI,
+        };
+        static constexpr std::array link_type_names = {
+            "GitHub",
+            "GitHug",
+            "Documentation",
+            "CI (Woodpecker)",
+        };
+        static constexpr std::array link_type_icons = {
+            "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png",
+            "https://git.jcm.re/assets/img/logo.svg",
+            "https://upload.wikimedia.org/wikipedia/commons/2/22/Document_%2889366%29_-_The_Noun_Project.svg",
+            "https://woodpecker.jcm.re/favicons/favicon-light-default.svg",
+        };
+
+        struct ProjectLink : public component<ProjectLink> {
+            ProjectLink(LinkType type, const std::string& url) :
+                component<ProjectLink>{
+                    a{{_href{url}, _target{"_blank"}, _title{link_type_names[std::to_underlying(type)]}},
+                        img{{_src{link_type_icons[std::to_underlying(type)]}, _alt{link_type_names[std::to_underlying(type)]}}}
+                    }
+                } {}
+        };
+
+        struct Project : public component<Project> {
+            Project(const std::string& name, const std::string& url, std::list<ProjectLink>&& links, const std::string& description) :
+                Project(name, url, std::move(links), fragment{description}) {}
+
+            Project(const std::string& name, const std::string& url, std::list<ProjectLink>&& links, fragment content) :
+                component<Project> {
+                    li{
+                        p{
+                            h4{a{{_href{url}, _target{"_blank"}}, name},
+                            dv{{_class{"project-links"}}, each<ProjectLink>(std::move(links))}},
+                            content
+                        }
+                    }
+                } {}
+        };
+
         return fragment{
             p{
                 "I have plenty of public projects!<br>",
@@ -303,72 +347,101 @@ namespace windows {
             },
             p{"Some of them are:"},
             ul{
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/discord-game-sdk4j"}, _target{"_blank"}}, h4{"discord-game-sdk4j"}},
+                Project{"discord-game-sdk4j", "https://github.com/JnCrMx/discord-game-sdk4j",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/discord-game-sdk4j"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/discord-game-sdk4j"},
+                     {LinkType::Docs, "https://docs.jcm.re/discord-game-sdk4j/"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/18"}},
                     "Java bindings for Discord's Game SDK.<br>"
                     "Now without using the native library and instead replicating the functionality entirely in pure Java."
+                },
+                Project{"xmbshell", "https://xmbshell.projects.jcm.re/",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/xmbshell"},
+                     {LinkType::GitHug, "https://git.jcm.re/XMB-OS/xmbshell"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/16"}},
+                    fragment{
+                        "A desktop shell mimicing the look and functionality of the XrossMediaBar.<br>",
+                        "It is written in C++ and uses Vulkan (with a ",
+                        a{{_href{"https://github.com/JnCrMx/dreamrender"}, _target{"_blank"}}, "self-written mini-framework"},
+                        ") for rendering and ",
+                        code{"glibmm"},"&amp;",code{"giomm"}," for everything else."
                 }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/xmbshell"}, _target{"_blank"}}, h4{"xmbshell"}},
-                    "A desktop shell mimicing the look and functionality of the XrossMediaBar.<br>",
-                    "It is written in C++ and uses Vulkan (with a ",
-                    a{{_href{"https://github.com/JnCrMx/dreamrender"}, _target{"_blank"}}, "self-written mini-framework"},
-                    ") for rendering and ",
-                    code{"glibmm"},"&amp;",code{"giomm"}," for everything else."
+                Project{"website", "https://jcm.re",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/website"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/website"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/22"}},
+                    fragment{
+                        b{"This very website you are visiting right now!"}, "<br>"
+                        "It is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library."
+                        "See the \"Source Code\" window for more information."
                 }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/cpp-toy-os"}, _target{"_blank"}}, h4{"cpp-toy-os"}},
+                Project{"cpp-toy-os", "https://github.com/JnCrMx/cpp-toy-os",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-toy-os"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/cutie-os"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/27"}},
                     "An operating system kernel for ARM written in modern C++, using coroutines.<br>"
                     "It is mostly a playground to try out how well certain modern features work in a freestanding environment (the answer is: pretty well)."
-                }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/VulkanBot"}, _target{"_blank"}}, h4{"VulkanBot"}},
+                },
+                Project{"VulkanBot", "https://vulkanbot.projects.jcm.re/",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/VulkanBot"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/VulkanBot"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/19"}},
                     "A Discord bot that can render models using custom Vulkan shaders and send the result as an image or video."
+                },
+                Project{"cheeky-imp", "https://git.jcm.re/cheeky-imp",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/cheeky-imp"},
+                     {LinkType::GitHug, "https://git.jcm.re/cheeky-imp/cheeky-imp"},
+                     {LinkType::Docs, "https://caddy.admin.jcm.re/docs/cheeky-imp/cheeky-imp/main/vulkan_layer/"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/17"}},
+                    fragment{
+                        "A framework for hooking into Vulkan-based games for extracting and replacing shaders, texture and models.<br>"
+                        "It makes use of a self-made rule-based language for adding custom behaviour and has multiple plugins, such as:",
+                        ul{
+                            li{a{{_href{"https://github.com/JnCrMx/cheeky-companion"}, _target{"_blank"}}, "cheeky-companion"}, " for rendering and controlling additional models"},
+                            li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-imgui"}, _target{"_blank"}}, "cheeky-imgui"}, " for easily adding an ImGui overlay"},
+                            li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-input-x11"}, _target{"_blank"}}, "cheeky-input-x11"}, " for capturing input from X11 based applications"},
+                            li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-datahook"}, _target{"_blank"}}, "cheeky-datahook"}, " for extracting data from shaders"},
+                            li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-dbus"}, _target{"_blank"}}, "cheeky-dbus"}, " for interacting with D-Bus services"},
+                        }
                 }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/cheeky-imp"}, _target{"_blank"}}, h4{"cheeky-imp"}},
-                    "A framework for hooking into Vulkan-based games for extracting and replacing shaders, texture and models.<br>"
-                    "It makes use of a self-made rule-based language for adding custom behaviour and has multiple plugins, such as:",
-                    ul{
-                        li{a{{_href{"https://github.com/JnCrMx/cheeky-companion"}, _target{"_blank"}}, "cheeky-companion"}, " for rendering and controlling additional models"},
-                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-imgui"}, _target{"_blank"}}, "cheeky-imgui"}, " for easily adding an ImGui overlay"},
-                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-input-x11"}, _target{"_blank"}}, "cheeky-input-x11"}, " for capturing input from X11 based applications"},
-                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-datahook"}, _target{"_blank"}}, "cheeky-datahook"}, " for extracting data from shaders"},
-                        li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-dbus"}, _target{"_blank"}}, "cheeky-dbus"}, " for interacting with D-Bus services"},
-                    }
-                }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/gpgfs"}, _target{"_blank"}}, h4{"gpgfs"}},
+                Project{"gpgfs", "https://github.com/JnCrMx/gpgfs",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/gpgfs"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/gpgfs"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/21"}},
                     "A FUSE filesystem that decrypts files on the access using GnuPG.<br>"
                     "I mainly use it for keeping credential files encrypted at rest."
-                }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/chocobotpp"}, _target{"_blank"}}, h4{"chocobotpp"}},
+                },
+                Project{"chocobotpp", "https://github.com/JnCrMx/chocobotpp",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/chocobotpp"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/chocobotpp"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/3"}},
                     "A general purpose Discord bot written in C++, containing fun commands and mini-games."
-                }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/cpp-snippets"}, _target{"_blank"}}, h4{"cpp-snippets"}},
+                },
+                Project{"cpp-snippets", "https://github.com/JnCrMx/cpp-snippets",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-snippets"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/cpp-snippets"}},
                     "A collection of useful C++ snippets."
-                }},
-                li{p{
-                    a{{_href{"https://github.com/JnCrMx/dreamrender"}, _target{"_blank"}}, h4{"dreamrender"}},
+                },
+                Project{"dreamrender", "https://github.com/JnCrMx/dreamrender",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/dreamrender"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/dreamrender"}},
                     "A simple Vulkan-based modern C++ render library used in some of my projects."
-                }},
+                },
             },
         };
     }};
     Window source_code{"source_code", "Source Code", [](){
         return fragment{
             p{
-                "This website is mostly written in C++ 23 using WASM and the ", code{"webxx"}, " library.<br>",
-                "It is compiled with ", code{"clang++"}, " and ", code{"lld"}, " (version 20) and built with ", code{"CMake"}, ".<br>",
+                "This website is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library.<br>",
+                "It is compiled with ", code{"clang++"}, " and ", code{"lld"}, " and built with ", code{"CMake"}, ".<br>",
                 "To provide a (more or less complete) standard library, ", code{"libc++-wasm32"} , " is used.<br>",
                 "It is using C++ named modules and coroutines just for fun and to test how well these modern features work already ", i{"(quite well!)"}, ".<br>",
                 "Interaction with the DOM and other browser APIs is done with self-made bindings (the ", code{"web"}, " and ", code{"web_coro"}, " modules).<br>",
             },
             p{"You can find the source code of the main file (in which I am typing this text right now) here:"},
             details{
-                summary{a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/main.cpp"}, _target{"_blank"}}, "src/main.cpp"}},
+                summary{a{{_href{std::format("https://git.jcm.re/jcm/website/src/commit/{}/src/main.cpp", files::views::git_commit_hash)}, _target{"_blank"}}, "src/main.cpp"}},
                 pre{src_main_sanitised},
             },
         };
@@ -389,9 +462,12 @@ namespace windows {
     }};
     Window build_info{"build_info", "Build Info", [](){
         return fragment{
+            "Build from commit ",
+            a{{_href{std::format("https://git.jcm.re/jcm/website/commit/{}", files::views::git_commit_hash)}, _target{"blank"}},
+              code{files::views::git_short_commit_hash}},
             std::format(
-                "Built from commit {} on {} at {} with {} version {}.{}.{}.",
-                files::views::git_short_commit_hash, __DATE__, __TIME__, utils::cxx_compiler_name,
+                " on {} at {} with {} version {}.{}.{}.",
+                __DATE__, __TIME__, utils::cxx_compiler_name,
                 utils::cxx_compiler_version_major, utils::cxx_compiler_version_minor, utils::cxx_compiler_version_patch
             )
         };
