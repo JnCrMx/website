@@ -51,6 +51,12 @@
             return document.getElementById(id);
         }
 
+        const errorCodes = {
+            success: 0,
+            element_not_found: 1,
+            property_not_found: 2,
+        }
+
         async function init() {
             const importObject = {
                 env: {
@@ -61,48 +67,99 @@
                     },
                     set_html: (id_ptr, id_len, html_ptr, html_len) => {
                         const id = get_string(instance, id_ptr, id_len);
-                        getElementByIdWithCache(id).innerHTML = get_string(instance, html_ptr, html_len);
+                        const elem = getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        elem.innerHTML = get_string(instance, html_ptr, html_len);
+                        return errorCodes.success;
                     },
                     set_property: (id_ptr, id_len, property_ptr, property_len, value_ptr, value_len) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const property = get_string(instance, property_ptr, property_len);
                         const value = get_string(instance, value_ptr, value_len);
-                        getElementByIdWithCache(id)[property] = value;
+                        const elem = getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        elem[property] = value;
+                        return errorCodes.success;
                     },
                     set_style_property: (id_ptr, id_len, property_ptr, property_len, value_ptr, value_len) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const property = get_string(instance, property_ptr, property_len);
                         const value = get_string(instance, value_ptr, value_len);
-                        getElementByIdWithCache(id).style[property] = value;
+                        const elem = getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        elem.style[property] = value;
+                        return errorCodes.success;
                     },
                     get_property: (id_ptr, id_len, property_ptr, property_len) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const property = get_string(instance, property_ptr, property_len);
-                        const str_ptr = copy_string_null(instance, getElementByIdWithCache(id)[property]);
+                        const elem = getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        const p = elem[property];
+                        if(p === undefined) {
+                            return errorCodes.property_not_found;
+                        }
+                        const str_ptr = copy_string_null(instance, p);
+                        return str_ptr;
+                    },
+                    get_style_property: (id_ptr, id_len, property_ptr, property_len) => {
+                        const id = get_string(instance, id_ptr, id_len);
+                        const property = get_string(instance, property_ptr, property_len);
+                        const elem = getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        const p = elem.style[property];
+                        if(p === undefined) {
+                            return errorCodes.property_not_found;
+                        }
+                        const str_ptr = copy_string_null(instance, p);
                         return str_ptr;
                     },
                     add_element: (parent_ptr, parent_len, tag_ptr, tag_len, id_ptr, id_len) => {
                         const parent = get_string(instance, parent_ptr, parent_len);
                         const tag = get_string(instance, tag_ptr, tag_len);
                         const id = get_string(instance, id_ptr, id_len);
+                        const p_elem = getElementByIdWithCache(parent);
+                        if(!p_elem) {
+                            return errorCodes.element_not_found;
+                        }
                         const element = document.createElement(tag);
                         element.setAttribute("id", id);
-                        getElementByIdWithCache(parent).appendChild(element);
+                        p_elem.appendChild(element);
                         new_element_cache[id] = element;
                         setTimeout(() => {
                             delete new_element_cache[id];
                         }, 0);
+                        return errorCodes.success;
                     },
                     add_element_html: (parent_ptr, parent_len, html_ptr, html_len) => {
                         const parent = get_string(instance, parent_ptr, parent_len);
                         const html = get_string(instance, html_ptr, html_len);
-                        getElementByIdWithCache(parent).insertAdjacentHTML("beforeend", html);
+                        const p_elem = getElementByIdWithCache(parent);
+                        if(!p_elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        p_elem.insertAdjacentHTML("beforeend", html);
+                        return errorCodes.success;
                     },
                     remove_element: (id_ptr, id_len) => {
                         const id = get_string(instance, id_ptr, id_len);
-                        const element = getElementByIdWithCache(id);
-                        element.remove();
+                        const elem = getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        elem.remove();
                         delete new_element_cache[id];
+                        return errorCodes.success;
                     },
                     log: (ptr, len) => {
                         console.log(get_string(instance, ptr, len));
@@ -110,8 +167,11 @@
                     add_event_listener: (id_ptr, id_len, event_ptr, event_len, ptr, once, preventDefault) => {
                         const id = get_string(instance, id_ptr, id_len);
                         const event = get_string(instance, event_ptr, event_len);
-                        const element = id === "__document__" ? document : getElementByIdWithCache(id);
-                        element.addEventListener(event, (e) => {
+                        const elem = id === "__document__" ? document : getElementByIdWithCache(id);
+                        if(!elem) {
+                            return errorCodes.element_not_found;
+                        }
+                        elem.addEventListener(event, (e) => {
                             if(preventDefault) {
                                 e.preventDefault();
                             }
@@ -119,6 +179,7 @@
                             instance.exports.callback(ptr, str_ptr, len);
                             delete_string(instance, str_ptr);
                         }, { once: once });
+                        return errorCodes.success;
                     },
                     set_timeout: (ms, ptr) => {
                         setTimeout(() => {

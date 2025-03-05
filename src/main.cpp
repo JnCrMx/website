@@ -148,8 +148,8 @@ public:
             nlohmann::json json = nlohmann::json::parse(j);
             if(json["button"] != 0)
                 return;
-            int offsetLeft = web::get_property_int(id, "offsetLeft");
-            int offsetTop = web::get_property_int(id, "offsetTop");
+            int offsetLeft = web::get_property_int(id, "offsetLeft").value_or(0);
+            int offsetTop = web::get_property_int(id, "offsetTop").value_or(0);
             grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
             grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
             grabbed_window = this;
@@ -179,7 +179,7 @@ public:
     }
     void toggle_minimize() {
         web::toggle_class(id, "minimized");
-        if(on_minimize) { on_minimize(web::has_class(id, "minimized")); }
+        if(on_minimize) { on_minimize(web::has_class(id, "minimized").value()); }
     }
     void maximize() {
         web::add_class(id, "maximized");
@@ -187,7 +187,7 @@ public:
     }
     void toggle_maximize() {
         web::toggle_class(id, "maximized");
-        if(on_maximize) { on_maximize(web::has_class(id, "maximized")); }
+        if(on_maximize) { on_maximize(web::has_class(id, "maximized").value()); }
     }
     void restore() {
         web::remove_class(id, "minimized");
@@ -437,7 +437,7 @@ static std::default_random_engine gen{std::random_device{}()};
 auto ganyu() -> web::coro::coroutine<void> {
     using namespace Webxx;
     static std::uniform_real_distribution<float> chance_dist{};
-    constexpr float ganyu_chance = 0.01f;
+    constexpr float ganyu_chance = 0.1f;
     constexpr auto ganyu_duration = std::chrono::seconds{60};
 
     while(true) {
@@ -461,14 +461,15 @@ auto ganyu() -> web::coro::coroutine<void> {
         const int height = 50;
         const int offset_x = 0;
         const int offset_y = -height;
+        int z_index = web::get_style_property_int(target_window->id, "zIndex").value_or(0);
 
         auto ganyu_elem = a{
             {
                 _id{"ganyu"},
                 _href{"https://git.jcm.re/jcm/"},
                 _target{"_blank"},
-                _style{std::format("left: {}px; top: {}px;",
-                    target_window->get_x()+offset_x, target_window->get_y()+offset_y)}
+                _style{std::format("left: {}px; top: {}px; z-index: {};",
+                    target_window->get_x()+offset_x, target_window->get_y()+offset_y, z_index)}
             },
             img{{_src{"ganyu.png"}, _alt{"Ganyu"}, _height{std::to_string(height)}}}
         };
@@ -477,8 +478,12 @@ auto ganyu() -> web::coro::coroutine<void> {
             web::set_style_property("ganyu", "left", "{}px", x+offset_x);
             web::set_style_property("ganyu", "top", "{}px", y+offset_y);
         });
+        auto ref2 = target_window->on_focus.add_unique([target_window]() {
+            int z_index = web::get_style_property_int(target_window->id, "zIndex").value_or(0);
+            web::set_style_property("ganyu", "zIndex", "{}", z_index);
+        });
         bool window_closed = false;
-        auto ref2 = target_window->on_close.add_unique([&window_closed](){
+        auto ref3 = target_window->on_close.add_unique([&window_closed](){
             window_closed = true;
         });
 
@@ -575,7 +580,7 @@ int my_main() {
     windows::cyndi.on_open += []() {
         submit([]()->coroutine<void> {
             co_await event{"secret_submit", "click"};
-            std::string password = web::get_property("secret_password", "value");
+            std::string password = web::get_property("secret_password", "value").value_or("");
             std::string res = co_await fetch("https://files.jcm.re/website_secret/"+password);
             web::set_html("secret_content", res);
             co_return;
@@ -583,7 +588,7 @@ int my_main() {
     };
     windows::c_interpreter.on_open += []() {
         web::add_event_listener("c_interpreter_submit", "click", [](std::string_view){
-            std::string code = web::get_property("c_interpreter_input", "value");
+            std::string code = web::get_property("c_interpreter_input", "value").value_or("");
             std::ostringstream output;
 
             {
