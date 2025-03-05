@@ -72,9 +72,10 @@ ul.licenses {
     margin-right: 0.25em;
 }
 .socials img {
-    width: 3em;
-    height: 3em;
-    border-radius: 25%;
+    width: 2.5em;
+    height: 2.5em;
+    padding: 0.5em;
+    border-radius: 50%;
     border: 1px solid #444;
 }
 
