@@ -716,9 +716,13 @@ int my_main() {
 
                 while(true) {
                     auto t = lex.next();
-                    if(t.kind == c_interpreter::token_kind::EOF_)
+                    if(!t) {
+                        output << "\nLexer error: " << t.error();
                         break;
-                    output << utils::enum_name(t.kind);
+                    }
+                    output << utils::enum_name(t->kind);
+                    if(t->kind == c_interpreter::token_kind::EOF_)
+                        break;
                     std::visit([&output](auto&& arg) {
                         using T = std::decay_t<decltype(arg)>;
                         if constexpr(std::is_same_v<T, std::string>) {
@@ -726,7 +730,7 @@ int my_main() {
                         } else if constexpr(!std::is_same_v<T, std::monostate>) {
                             output << "[" << arg << "]";
                         }
-                    }, t.value);
+                    }, t->value);
                     output << " ";
                 }
             }
@@ -737,7 +741,7 @@ int my_main() {
                 c_interpreter::parser parser{lex};
                 auto res = parser.parse_program();
                 if(!res) {
-                    output << "Parse error: " << res.error() << "\n";
+                    output << "Parser error: " << res.error() << "\n";
                 }
             }
 

@@ -31,6 +31,8 @@ FetchCOntent_Declare(tinyxml2
     GIT_TAG v10.0.0)
 
 set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
+add_compile_options(-fno-rtti -fno-exceptions)
 FetchContent_MakeAvailable(webxx json tinyxml2)
 
 add_library(webxxModule STATIC)

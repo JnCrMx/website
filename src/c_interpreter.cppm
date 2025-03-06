@@ -49,21 +49,27 @@ export struct token {
     std::variant<std::monostate, std::string, int> value;
 };
 
+export using lexer_error = std::string;
+
 export template<unsigned int Lookahead>
 class lexer {
 public:
     lexer(std::istream& input) : m_input(input) {
         for (unsigned int i = 0; i < Lookahead+1; ++i) {
-            m_buffer[i] = read();
+            m_buffer[i] = read().value_or(token{token_kind::EOF_});
         }
     }
-    token next() {
+    std::expected<token, lexer_error> next() {
         token result = m_buffer[0];
         for (unsigned int i = 0; i < Lookahead; ++i) {
             m_buffer[i] = m_buffer[i+1];
         }
-        m_buffer[Lookahead] = read();
-        return result;
+        if(auto r = read()) {
+            m_buffer[Lookahead] = r.value();
+            return result;
+        } else {
+            return std::unexpected(r.error());
+        }
     }
     token peek(unsigned int n = 0) {
         return m_buffer[n];
@@ -74,7 +80,7 @@ private:
     std::array<token, Lookahead+1> m_buffer;
     static constexpr auto EOF = std::string::traits_type::eof();
 
-    token read() {
+    std::expected<token, lexer_error> read() {
         while(true) {
             char c = m_input.peek();
             if(std::isspace(c)) {
@@ -120,7 +126,7 @@ private:
                 m_input.get();
                 c = m_input.peek();
                 if(c != '=') {
-                    throw std::runtime_error(std::string("unknown lexeme '!")+c+'\'');
+                    return std::unexpected(std::format("unknown lexeme '!{}'", c));
                 }
                 m_input.get();
                 return token{token_kind::NE};
@@ -207,7 +213,7 @@ private:
             } else if(c == EOF) {
                 return token{token_kind::EOF_};
             } else {
-                throw std::runtime_error(std::string("invalid character detected: '")+c+'\'');
+                return std::unexpected(std::format("invalid character detected: '{}'", c));
             }
         }
     }
@@ -351,12 +357,15 @@ export class parser {
             return true;
         }
         std::expected<token, parser_error> match(token_kind kind) {
-            token t = m_lexer.next();
-            if(t.kind != kind) {
-                return std::unexpected(std::format("unexpected token {}, expected {}",
-                    utils::enum_name(t.kind), utils::enum_name(kind)));
-            }
-            return t;
+            return m_lexer.next()
+                .transform_error([](lexer_error e) { return parser_error("LEXER: "+e); })
+                .and_then([kind](token t) -> std::expected<token, parser_error> {
+                    if(t.kind != kind) {
+                        return std::unexpected(std::format("unexpected token {}, expected {}",
+                            utils::enum_name(t.kind), utils::enum_name(kind)));
+                    }
+                    return t;
+                });
         }
         void next() {
             m_lexer.next();
