@@ -79,6 +79,13 @@ ul.licenses {
     border: 1px solid #444;
 }
 
+.columns-3 {
+    columns: 3;
+    -webkit-columns: 3;
+    -moz-columns: 3;
+    width: fit-content;
+}
+
 .window {
     border: 1px solid #444;
     border-radius: 9px;

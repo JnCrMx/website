@@ -426,7 +426,7 @@ namespace windows {
                     fragment{
                         "A general purpose Discord bot written in C++ using the ", a{{_href{"https://dpp.dev/"}, _target{"_blank"}}, "D++ library"},
                         ", containing fun commands and mini-games.<br>",
-                        b{"Features:"}, ul{
+                        b{"Features:"}, ul{{_class{"columns-3"}},
                             li{"simple economy system"},
                             li{"reminders"},
                             li{"some minigames"},
