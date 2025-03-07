@@ -423,8 +423,20 @@ namespace windows {
                     {{LinkType::GitHub, "https://github.com/JnCrMx/chocobotpp"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/chocobotpp"},
                      {LinkType::CI, "https://woodpecker.jcm.re/repos/3"}},
-                    "A general purpose Discord bot written in C++, containing fun commands and mini-games."
-                },
+                    fragment{
+                        "A general purpose Discord bot written in C++ using the ", a{{_href{"https://dpp.dev/"}, _target{"_blank"}}, "D++ library"},
+                        ", containing fun commands and mini-games.<br>",
+                        b{"Features:"}, ul{
+                            li{"simple economy system"},
+                            li{"reminders"},
+                            li{"some minigames"},
+                            li{"some fun commands"},
+                            li{"Christmas presents"},
+                            li{"a (WIP) web dashboard"},
+                            li{"simple custom commands"},
+                            li{"freely definable command aliases"},
+                        },
+                }},
                 Project{"cpp-snippets", "https://github.com/JnCrMx/cpp-snippets",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-snippets"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/cpp-snippets"}},
