@@ -609,11 +609,8 @@ int my_main() {
     web::log("Hello World!");
     web::set_html("main", Webxx::render(page()));
 
-    std::string hash = web::eval("location.hash");
-    bool cyndi = hash == "#cyndi";
-
     Window::setup();
-    web::coro::submit([](bool cyndi)->web::coro::coroutine<void> {
+    web::coro::submit([]()->web::coro::coroutine<void> {
         co_await web::coro::when_all(
             windows::blog.open(400, 450),
             windows::about_me.open(75, 50),
@@ -623,11 +620,23 @@ int my_main() {
             windows::build_info.open(50, 800)
             //windows::c_interpreter.open(400, 100)
         );
+
+        std::string hash = web::eval("location.hash");
+        bool cyndi = hash == "#cyndi";
         if(cyndi) {
             co_await windows::cyndi.open(500, 250);
+        } else if(hash.size() > 1) {
+            auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
+            for(auto& w : all_windows) {
+                if(w->id == fullscreen_window_id) {
+                    w->maximize();
+                    w->bring_to_front();
+                    break;
+                }
+            }
         }
         co_return;
-    }(cyndi));
+    }());
 
     auto close_handler = []() {
         bool all_closed = true;
