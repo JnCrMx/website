@@ -588,8 +588,11 @@ auto ganyu() -> web::coro::coroutine<void> {
             int z_index = web::get_style_property_int(target_window->id, "zIndex").value_or(0);
             web::set_style_property("ganyu", "zIndex", "{}", z_index);
         });
+        auto ref3 = target_window->on_maximize.add_unique([](bool maximized) {
+            web::set_style_property("ganyu", "display", maximized ? "none" : "unset");
+        });
         bool window_closed = false;
-        auto ref3 = target_window->on_close.add_unique([&window_closed](){
+        auto ref4 = target_window->on_close.add_unique([&window_closed](){
             window_closed = true;
         });
 
