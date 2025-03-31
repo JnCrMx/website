@@ -1,6 +1,5 @@
 import std;
-import web;
-import web_coro;
+import webpp;
 import nlohmann_json;
 import webxx;
 import tinyxml2;
@@ -167,6 +166,12 @@ namespace windows {
                         b{"This very website you are visiting right now!"}, "<br>"
                         "It is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library. Look at the \"Source Code\" window for more information."
                 }},
+                Project{"webpp", "https://github.com/JnCrMx/webpp",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/webpp"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/webpp"}},
+                    "A simple C++ library for interacting with the DOM and other browser APIs.<br>"
+                    "It is used in this website for handling events, creating elements, making fetch requests and much more."
+                },
                 Project{"cpp-toy-os", "https://github.com/JnCrMx/cpp-toy-os",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-toy-os"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/cutie-os"},
@@ -246,7 +251,7 @@ namespace windows {
                 "It is compiled with ", code{"clang++"}, " and ", code{"lld"}, " and built with ", code{"CMake"}, ".<br>",
                 "To provide a (more or less complete) standard library, ", code{"libc++-wasm32"} , " is used.<br>",
                 "It is using C++ named modules and coroutines just for fun and to test how well these modern features work already ", i{"(quite well!)"}, ".<br>",
-                "Interaction with the DOM and other browser APIs is done with self-made bindings (the ", code{"web"}, " and ", code{"web_coro"}, " modules).<br>",
+                "Interaction with the DOM and other browser APIs is done with self-made bindings (the ", code{"webpp"}, " library).<br>",
             },
             p{"You can find the source code of the main file (in which I am typing this text right now) here:"},
             details{
@@ -327,14 +332,14 @@ auto page() {
 
 static std::default_random_engine gen{std::random_device{}()};
 
-auto ganyu() -> web::coro::coroutine<void> {
+auto ganyu() -> webpp::coroutine<void> {
     using namespace Webxx;
     static std::uniform_real_distribution<float> chance_dist{};
     constexpr float ganyu_chance = 0.1f;
     constexpr auto ganyu_duration = std::chrono::seconds{60};
 
     while(true) {
-        co_await web::coro::timeout(std::chrono::seconds{1});
+        co_await webpp::coro::timeout(std::chrono::seconds{1});
         if(chance_dist(gen) > ganyu_chance) {
             continue;
         }
@@ -350,11 +355,12 @@ auto ganyu() -> web::coro::coroutine<void> {
         }
         std::uniform_int_distribution<int> window_dist(0, open_windows.size()-1);
         auto target_window = open_windows[window_dist(gen)];
+        auto target_element = *webpp::get_element_by_id(target_window->id);
 
         const int height = 50;
         const int offset_x = 0;
         const int offset_y = -height;
-        int z_index = web::get_style_property_int(target_window->id, "zIndex").value_or(0);
+        int z_index = target_element.style()["zIndex"].as<int>().value_or(0);
 
         auto ganyu_elem = a{
             {
@@ -366,17 +372,20 @@ auto ganyu() -> web::coro::coroutine<void> {
             },
             img{{_src{"ganyu.png"}, _alt{"Ganyu"}, _height{std::to_string(height)}}}
         };
-        web::add_element_html("main", Webxx::render(ganyu_elem));
-        auto ref1 = target_window->on_move.add_unique([offset_x, offset_y](int x, int y) {
-            web::set_style_property("ganyu", "left", "{}px", x+offset_x);
-            web::set_style_property("ganyu", "top", "{}px", y+offset_y);
+        auto ganyu_element = *webpp::create_element_from_html(Webxx::render(ganyu_elem));
+        webpp::get_element_by_id("main")->append_child(ganyu_element);
+
+        auto ref1 = target_window->on_move.add_unique([&ganyu_element, offset_x, offset_y](int x, int y) {
+            auto style = ganyu_element.style();
+            style["left"] = std::format("{}px", x+offset_x);
+            style["top"] = std::format("{}px", y+offset_y);
         });
-        auto ref2 = target_window->on_focus.add_unique([target_window]() {
-            int z_index = web::get_style_property_int(target_window->id, "zIndex").value_or(0);
-            web::set_style_property("ganyu", "zIndex", "{}", z_index);
+        auto ref2 = target_window->on_focus.add_unique([&ganyu_element, &target_element]() {
+            int z_index = target_element.style()["zIndex"].as<int>().value_or(0);
+            ganyu_element.style()["zIndex"] = z_index;
         });
-        auto ref3 = target_window->on_maximize.add_unique([](bool maximized) {
-            web::set_style_property("ganyu", "display", maximized ? "none" : "unset");
+        auto ref3 = target_window->on_maximize.add_unique([&ganyu_element](bool maximized) {
+            ganyu_element.style()["display"] = maximized ? "none" : "unset";
         });
         bool window_closed = false;
         auto ref4 = target_window->on_close.add_unique([&window_closed](){
@@ -385,10 +394,10 @@ auto ganyu() -> web::coro::coroutine<void> {
 
         constexpr auto tick = std::chrono::milliseconds{100};
         for(unsigned int i=0; i<ganyu_duration/tick && !window_closed; i++) {
-            co_await web::coro::timeout(std::chrono::milliseconds{100});
+            co_await webpp::coro::timeout(std::chrono::milliseconds{100});
         }
 
-        web::remove_element("ganyu");
+        ganyu_element.remove();
     }
 
     co_return;
@@ -396,25 +405,24 @@ auto ganyu() -> web::coro::coroutine<void> {
 
 [[clang::export_name("main")]]
 int my_main() {
-    web::log("Hello World!");
-    web::set_html("main", Webxx::render(page()));
+    webpp::log("Hello World!");
+    webpp::get_element_by_id("main")->inner_html(Webxx::render(page()));
 
     Window::setup();
-    web::coro::submit([]()->web::coro::coroutine<void> {
-        co_await web::coro::when_all(
-            windows::blog.open(400, 450),
-            windows::about_me.open(75, 50),
-            windows::projects.open(800, 100),
-            windows::source_code.open(900, 500),
-            windows::licenses.open(100, 550),
-            windows::build_info.open(50, 800)
-            //windows::c_interpreter.open(400, 100)
-        );
+    webpp::coro::submit([]() -> webpp::coroutine<void> {
+        co_await webpp::coro::next_tick();
+        windows::blog.open(400, 450);
+        windows::about_me.open(75, 50);
+        windows::projects.open(800, 100);
+        windows::source_code.open(900, 500);
+        windows::licenses.open(100, 550);
+        windows::build_info.open(50, 800);
+        //windows::c_interpreter.open(400, 100);
 
-        std::string hash = web::eval("location.hash");
+        std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
         bool cyndi = hash == "#cyndi";
         if(cyndi) {
-            co_await windows::cyndi.open(500, 250);
+            windows::cyndi.open(500, 250);
         } else if(hash.size() > 1) {
             auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
             for(auto& w : all_windows) {
@@ -439,13 +447,16 @@ int my_main() {
 
         if(all_closed) {
             using namespace Webxx;
-            web::set_html("close_message", render(fragment{
+            webpp::get_element_by_id("close_message")->inner_html(render(fragment{
                 h2{"You closed all windows!"},
                 button{{_id{"reopen_button"}}, "Reopen them all~!"}
             }));
-            using namespace web::coro;
-            submit_next([]()->coroutine<void> {
-                co_await event{"reopen_button", "click"};
+            using namespace webpp::coro;
+            submit([]() -> coroutine<void> {
+                co_await next_tick();
+
+                auto reopen_button = *webpp::get_element_by_id("reopen_button");
+                co_await reopen_button.event("click");
 
                 constexpr std::array messages = {
                     "Are you sure? ;)",
@@ -461,20 +472,18 @@ int my_main() {
                     } while(r == last);
                     last = r;
 
-                    web::set_html("reopen_button", messages[r]);
-                    co_await event{"reopen_button", "click"};
+                    reopen_button.inner_text(messages[r]);
+                    co_await reopen_button.event("click");
                 }
 
-                web::set_html("close_message", "");
-                co_await web::coro::when_all(
-                    windows::blog.open(),
-                    windows::about_me.open(),
-                    windows::projects.open(),
-                    windows::source_code.open(),
-                    windows::licenses.open(),
-                    windows::build_info.open()
-                    //windows::c_interpreter.open()
-                );
+                webpp::get_element_by_id("close_message")->inner_html("");
+                windows::blog.open();
+                windows::about_me.open();
+                windows::projects.open();
+                windows::source_code.open();
+                windows::licenses.open();
+                windows::build_info.open();
+                //windows::c_interpreter.open();
                 co_return;
             }());
         }
@@ -483,10 +492,10 @@ int my_main() {
         w->on_close += close_handler;
     }
 
-    using namespace web::coro;
+    using namespace webpp::coro;
     windows::blog.on_open += []() {
         submit([]()->coroutine<void> {
-            std::string xml = co_await fetch("https://files.jcm.re/blog.xml");
+            std::string xml = co_await fetch("https://files.jcm.re/blog.xml").then(std::mem_fn(&webpp::response::co_text));
             tinyxml2::XMLDocument doc;
             doc.Parse(xml.data(), xml.size());
             tinyxml2::XMLElement* root = doc.FirstChildElement("rss");
@@ -497,28 +506,29 @@ int my_main() {
                 std::string pubDate = item->FirstChildElement("pubDate")->GetText();
                 std::string description = item->FirstChildElement("description")->GetText();
                 using namespace Webxx;
-                web::add_element_html("blog_container", render(fragment{
+                auto element = webpp::create_element_from_html(render(dv{
                     h2{a{{_href{link}, _target{"_blank"}}, title}},
                     p{i{pubDate}},
                     p{description},
                     hr{},
                 }));
+                webpp::get_element_by_id("blog_container")->append_child(*element);
             }
             co_return;
         }());
     };
     windows::cyndi.on_open += []() {
         submit([]()->coroutine<void> {
-            co_await event{"secret_submit", "click"};
-            std::string password = web::get_property("secret_password", "value").value_or("");
-            std::string res = co_await fetch("https://files.jcm.re/website_secret/"+password);
-            web::set_html("secret_content", res);
+            co_await webpp::get_element_by_id("secret_submit")->event("click");
+            std::string password = webpp::get_element_by_id("secret_password")->get_property<std::string>("value").value_or("");
+            std::string res = co_await fetch("https://files.jcm.re/website_secret/"+password).then(std::mem_fn(&webpp::response::co_text));
+            webpp::get_element_by_id("secret_content")->inner_html(res);
             co_return;
         }());
     };
     windows::c_interpreter.on_open += []() {
-        web::add_event_listener("c_interpreter_submit", "click", [](std::string_view){
-            std::string code = web::get_property("c_interpreter_input", "value").value_or("");
+        webpp::get_element_by_id("c_interpreter_submit")->add_event_listener("click", [](webpp::event){
+            std::string code = webpp::get_element_by_id("c_interpreter_input")->get_property<std::string>("value").value_or("");
             std::ostringstream output;
 
             {
@@ -555,11 +565,10 @@ int my_main() {
                     output << "Parser error: " << res.error() << "\n";
                 }
             }
-
-            web::set_property("c_interpreter_output", "value", output.str());
+            webpp::get_element_by_id("c_interpreter_output")->set_property("value", output.str());
         });
     };
-    web::coro::submit(ganyu());
+    webpp::coro::submit(ganyu());
 
     return 0;
 }

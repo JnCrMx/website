@@ -21,6 +21,10 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Oz")
 
 include(FetchContent)
 
+FetchContent_Declare(webpp
+    GIT_REPOSITORY https://git.jcm.re/jcm/webpp.git
+    GIT_TAG main
+)
 FetchContent_Declare(webxx
     GIT_REPOSITORY https://github.com/rthrfrd/webxx.git
     GIT_TAG v0.9.2
@@ -31,9 +35,9 @@ FetchCOntent_Declare(tinyxml2
     GIT_TAG v10.0.0)
 
 set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-
+set(webpp_BUILD_STD_MODULE OFF CACHE BOOL "" FORCE)
 add_compile_options(-fno-rtti -fno-exceptions)
-FetchContent_MakeAvailable(webxx json tinyxml2)
+FetchContent_MakeAvailable(webpp webxx json tinyxml2)
 
 add_library(webxxModule STATIC)
 target_sources(webxxModule PUBLIC FILE_SET CXX_MODULES FILES third_party/webxx.cppm)
@@ -64,8 +68,6 @@ set(SOURCES
     src/c++support.cpp
 )
 set(MODULE_SOURCES
-    src/web.cppm
-    src/web_coro.cppm
     src/components.cppm
     src/utils.cppm
     src/c_interpreter.cppm
@@ -76,6 +78,14 @@ target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES ${MODULE_
 target_compile_features(website PRIVATE cxx_std_26)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
-target_link_libraries(website PRIVATE stdModule webxxModule jsonModule tinyxml2Module)
+target_link_libraries(website PRIVATE stdModule webxxModule jsonModule tinyxml2Module webpp::webpp)
 target_compile_options(website PRIVATE --embed-dir=${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(website PRIVATE -Wno-c23-extensions)
+
+FetchContent_GetProperties(webpp)
+add_custom_command(
+    COMMAND ${CMAKE_COMMAND} -E copy ${webpp_SOURCE_DIR}/webpp.js ${CMAKE_CURRENT_BINARY_DIR}/webpp.js
+    DEPENDS ${webpp_SOURCE_DIR}/webpp.js
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/webpp.js
+)
+add_custom_target(copy_webpp_js ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/webpp.js)

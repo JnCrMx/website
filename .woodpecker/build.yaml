@@ -26,9 +26,7 @@ steps:
         -DCMAKE_C_COMPILER_AR=llvm-ar-19 -DCMAKE_CXX_COMPILER_AR=llvm-ar-19
         -S . -B build 2>&1 | tee build/cmake-configure.log
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
-      - cp -r public build/public
-      - rm build/public/website.wasm # remove dangling symlink
-      - cp build/website.wasm build/public/website.wasm
+      - cp -L -r public build/public # this will dereference symlinks
       - wasm-strip build/public/website.wasm
   upload-logs:
     image: woodpeckerci/plugin-s3

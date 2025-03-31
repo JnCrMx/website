@@ -1,8 +1,7 @@
 export module components;
 
 import std;
-import web;
-import web_coro;
+import webpp;
 import webxx;
 import nlohmann_json;
 
@@ -94,83 +93,87 @@ export class Window {
         }
 
         void setup(int initial_x, int initial_y) {
-            web::add_event_listener(id+"__titlebar", "mousedown", [this](std::string_view j) {
-                nlohmann::json json = nlohmann::json::parse(j);
-                if(json["button"] != 0)
+            webpp::get_element_by_id(id+"__titlebar")->add_event_listener("mousedown", [this](webpp::event event) {
+                if(event["button"].as<int>() != 0)
                     return;
-                int offsetLeft = web::get_property_int(id, "offsetLeft").value_or(0);
-                int offsetTop = web::get_property_int(id, "offsetTop").value_or(0);
-                grab_start_x = static_cast<int>(json["clientX"]) - offsetLeft;
-                grab_start_y = static_cast<int>(json["clientY"]) - offsetTop;
+                event.prevent_default();
+
+                auto window = *webpp::get_element_by_id(id);
+                int offsetLeft = *window["offsetLeft"].as<int>();
+                int offsetTop = *window["offsetTop"].as<int>();
+                grab_start_x = *event["clientX"].as<int>() - offsetLeft;
+                grab_start_y = *event["clientY"].as<int>() - offsetTop;
                 grabbed_window = this;
-                web::add_class(id, "grabbed");
-            }, false, true);
-            web::add_event_listener(id, "mousedown", [this](std::string_view) {
+                window.add_class("grabbed");
+            });
+            webpp::get_element_by_id(id)->add_event_listener("mousedown", [this](webpp::event event) {
                 bring_to_front();
             });
-            web::add_event_listener(id+"__minimize", "click", [this](std::string_view) {
+            webpp::get_element_by_id(id+"__minimize")->add_event_listener("click", [this](webpp::event) {
                 minimize();
             });
-            web::add_event_listener(id+"__maximize", "click", [this](std::string_view) {
+            webpp::get_element_by_id(id+"__maximize")->add_event_listener("click", [this](webpp::event) {
                 toggle_maximize();
             });
-            web::add_event_listener(id+"__close", "click", [this](std::string_view) {
+            webpp::get_element_by_id(id+"__close")->add_event_listener("click", [this](webpp::event) {
                 close();
             });
             move(initial_x, initial_y);
         }
         void bring_to_front() {
-            web::set_style_property(id, "zIndex", "{}", highest_z_index++);
+            (*webpp::get_element_by_id(id)).style()["zIndex"] = highest_z_index++;
             if(on_focus) { on_focus(); }
         }
         void minimize() {
-            web::add_class(id, "minimized");
+            webpp::get_element_by_id(id)->add_class("minimized");
             if(on_minimize) { on_minimize(true); }
         }
         void toggle_minimize() {
-            web::toggle_class(id, "minimized");
-            if(on_minimize) { on_minimize(web::has_class(id, "minimized").value()); }
+            auto e = *webpp::get_element_by_id(id);
+            e.toggle_class("minimized");
+            if(on_minimize) { on_minimize(e.classes().contains("minimized")); }
         }
         void maximize() {
-            web::add_class(id, "maximized");
+            webpp::get_element_by_id(id)->add_class("maximized");
             if(on_maximize) { on_maximize(true); }
         }
         void toggle_maximize() {
-            web::toggle_class(id, "maximized");
-            if(on_maximize) { on_maximize(web::has_class(id, "maximized").value()); }
+            auto e = *webpp::get_element_by_id(id);
+            e.toggle_class("maximized");
+            if(on_maximize) { on_maximize(e.classes().contains("maximized")); }
         }
         void restore() {
-            web::remove_class(id, "minimized");
-            web::remove_class(id, "maximized");
+            auto e = *webpp::get_element_by_id(id);
+            e.remove_class("maximized");
+            e.remove_class("minimized");
             if(on_restore) { on_restore(); }
         }
         void move(int x, int y) {
-            web::set_style_property(id, "left", "{}px", x);
-            web::set_style_property(id, "top", "{}px", y);
+            auto e = *webpp::get_element_by_id(id);
+            e.style()["left"] = std::format("{}px", x);
+            e.style()["top"] = std::format("{}px", y);
             m_x = x;
             m_y = y;
             if(on_move) { on_move(m_x, m_y); }
         }
         void close() {
-            web::remove_element(id);
+            webpp::get_element_by_id(id)->remove();
             m_open = false;
             if(on_close) { on_close(); }
         }
 
-        [[nodiscard("This is a coroutine, you must either co_await or submit it.")]]
-        auto open() {
+        void open() {
             return open(m_x, m_y);
         }
 
-        [[nodiscard("This is a coroutine, you must either co_await or submit it.")]]
-        auto open(int initial_x, int initial_y) -> web::coro::coroutine<void> {
+        void open(int initial_x, int initial_y) {
             std::string html = Webxx::render(render_window(initial_x, initial_y));
-            web::add_element_html("main", html);
-            co_await web::coro::next_tick();
+            auto el = webpp::create_element_from_html(html);
+            webpp::get_element_by_id("main")->append_child(*el);
+
             setup(initial_x, initial_y);
             m_open = true;
             if(on_open) { on_open(); }
-            co_return;
         }
 
         bool is_open() const {
@@ -192,8 +195,8 @@ export class Window {
         ActionHandlerList<int, int> on_move;
 
         static void setup() {
-            web::add_event_listener("__document__", "mouseup", global_mouseup);
-            web::add_event_listener("__document__", "mousemove", global_mousemove);
+            webpp::document.add_event_listener("mouseup", global_mouseup);
+            webpp::document.add_event_listener("mousemove", global_mousemove);
         }
 
     private:
@@ -207,18 +210,17 @@ export class Window {
         static inline int grab_start_x = 0;
         static inline int grab_start_y = 0;
         static inline struct Window* grabbed_window = nullptr;
-        static void global_mouseup(std::string_view) {
+        static void global_mouseup(webpp::event) {
             if(!grabbed_window)
                 return;
-            web::remove_class(grabbed_window->id, "grabbed");
+            webpp::get_element_by_id(grabbed_window->id)->remove_class("grabbed");
             grabbed_window = nullptr;
         }
-        static void global_mousemove(std::string_view j) {
+        static void global_mousemove(webpp::event e) {
             if(!grabbed_window)
                 return;
-            nlohmann::json json = nlohmann::json::parse(j);
-            int y = static_cast<int>(json["clientY"]) - grab_start_y;
-            int x = static_cast<int>(json["clientX"]) - grab_start_x;
+            int y = *e["clientY"].as<int>() - grab_start_y;
+            int x = *e["clientX"].as<int>() - grab_start_x;
             grabbed_window->move(x, y);
         }
 };
