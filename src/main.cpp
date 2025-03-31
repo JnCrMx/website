@@ -1,6 +1,5 @@
 import std;
 import webpp;
-import nlohmann_json;
 import webxx;
 import tinyxml2;
 
@@ -14,9 +13,6 @@ namespace files {
     };
     constexpr char webxx_license[] = {
         #embed "build/_deps/webxx-src/LICENSE.md"
-    };
-    constexpr char json_license[] = {
-        #embed "build/_deps/json-src/LICENSE.MIT"
     };
     constexpr char tinyxml2_license[] = {
         #embed "build/_deps/tinyxml2-src/LICENSE.txt"
@@ -42,7 +38,6 @@ namespace files {
     }
     namespace views {
         constexpr std::string_view webxx_license{::files::webxx_license, sizeof(::files::webxx_license)};
-        constexpr std::string_view json_license{::files::json_license, sizeof(::files::json_license)};
         constexpr std::string_view tinyxml2_license{::files::tinyxml2_license, sizeof(::files::tinyxml2_license)};
 
         constexpr std::string_view git_commit_hash{::files::arrays::git_commit_hash.data(), ::files::arrays::git_commit_hash.size()};
@@ -266,10 +261,6 @@ namespace windows {
                 li{details{
                     summary{a{{_href{"https://github.com/rthrfrd/webxx"}, _target{"_blank"}}, code{"webxx"}}},
                     pre{files::views::webxx_license},
-                }},
-                li{details{
-                    summary{a{{_href{"https://github.com/nlohmann/json"}, _target{"_blank"}}, code{"nlohmann::json"}}},
-                    pre{files::views::json_license},
                 }},
                 li{details{
                     summary{a{{_href{"https://github.com/leethomason/tinyxml2"}, _target{"_blank"}}, code{"TinyXML-2"}}},
