@@ -85,6 +85,9 @@ ul.licenses {
     -moz-columns: 3;
     width: fit-content;
 }
+.gray {
+    color: lightgray;
+}
 
 .window {
     border: 1px solid #444;
