@@ -388,7 +388,7 @@ auto render_dock() {
 auto page() {
     using namespace Webxx;
     return fragment{
-        render_dock(),
+        dv{{_id{"dock_container"}}, render_dock()},
         h1{"Hello from JCM!"},
         dv{{_id{"close_message"}}},
     };
@@ -417,6 +417,13 @@ auto ganyu() -> webpp::coroutine<void> {
         if(open_windows.empty()) {
             continue;
         }
+        bool is_one_maximized = std::ranges::any_of(all_windows, [](Window* w) {
+            return w->get_state() == Window::window_state::maximized;
+        });
+        if(is_one_maximized) {
+            continue;
+        }
+
         std::uniform_int_distribution<int> window_dist(0, open_windows.size()-1);
         auto target_window = open_windows[window_dist(gen)];
         auto target_element = *webpp::get_element_by_id(target_window->id);
@@ -483,7 +490,7 @@ int my_main() {
         windows::build_info.open(50, 800);
         //windows::c_interpreter.open(400, 100);
 
-        webpp::get_element_by_id("dock")->inner_html(Webxx::render(render_dock()));
+        webpp::get_element_by_id("dock_container")->inner_html(Webxx::render(render_dock()));
 
         std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
         bool cyndi = hash == "#cyndi";
@@ -503,7 +510,7 @@ int my_main() {
     }());
 
     auto close_handler = []() {
-        webpp::get_element_by_id("dock")->inner_html(Webxx::render(render_dock()));
+        webpp::get_element_by_id("dock_container")->inner_html(Webxx::render(render_dock()));
 
         bool all_closed = true;
         for(auto& w : all_windows) {
@@ -555,13 +562,24 @@ int my_main() {
                 windows::build_info.open();
                 //windows::c_interpreter.open();
 
-                webpp::get_element_by_id("dock")->inner_html(Webxx::render(render_dock()));
+                webpp::get_element_by_id("dock_container")->inner_html(Webxx::render(render_dock()));
                 co_return;
             }());
         }
     };
+    auto state_change_handler = []() {
+        bool is_one_maximized = std::ranges::any_of(all_windows, [](Window* w) {
+            return w->get_state() == Window::window_state::maximized;
+        });
+        if(is_one_maximized) {
+            webpp::get_element_by_id("dock_container")->style()["display"] = "none";
+        } else {
+            webpp::get_element_by_id("dock_container")->style()["display"] = "unset";
+        }
+    };
     for(auto& w : all_windows) {
         w->on_close += close_handler;
+        w->on_state_change += state_change_handler;
     }
 
     using namespace webpp::coro;

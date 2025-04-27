@@ -71,16 +71,16 @@ struct ActionHandlerList {
 
 export class Window {
     public:
+        enum class window_state {
+            normal,
+            minimized,
+            maximized,
+            closed
+        };
+
         constexpr Window(std::string&& id, std::string&& title, std::string&& icon, std::add_pointer_t<Webxx::fragment()> content) :
             id(id), m_title(title), m_icon(icon), m_content(content) {}
         const std::string id;
-
-        const std::string& get_title() const {
-            return m_title;
-        }
-        const std::string& get_icon() const {
-            return m_icon;
-        }
 
         auto render_window(int x = 0, int y = 0) {
             using namespace Webxx;
@@ -132,27 +132,43 @@ export class Window {
         }
         void minimize() {
             webpp::get_element_by_id(id)->add_class("minimized");
+            is_minimized = true;
+
             if(on_minimize) { on_minimize(true); }
+            if(on_state_change) { on_state_change(); }
         }
         void toggle_minimize() {
             auto e = *webpp::get_element_by_id(id);
             e.toggle_class("minimized");
-            if(on_minimize) { on_minimize(e.classes().contains("minimized")); }
+            is_minimized = !is_minimized;
+
+            if(on_minimize) { on_minimize(is_minimized); }
+            if(on_state_change) { on_state_change(); }
         }
         void maximize() {
             webpp::get_element_by_id(id)->add_class("maximized");
+            is_maximized = true;
+
             if(on_maximize) { on_maximize(true); }
+            if(on_state_change) { on_state_change(); }
         }
         void toggle_maximize() {
             auto e = *webpp::get_element_by_id(id);
             e.toggle_class("maximized");
-            if(on_maximize) { on_maximize(e.classes().contains("maximized")); }
+            is_maximized = !is_maximized;
+
+            if(on_maximize) { on_maximize(is_maximized); }
+            if(on_state_change) { on_state_change(); }
         }
         void restore() {
             auto e = *webpp::get_element_by_id(id);
             e.remove_class("maximized");
             e.remove_class("minimized");
+            is_maximized = false;
+            is_minimized = false;
+
             if(on_restore) { on_restore(); }
+            if(on_state_change) { on_state_change(); }
         }
         void move(int x, int y) {
             auto e = *webpp::get_element_by_id(id);
@@ -166,6 +182,7 @@ export class Window {
             webpp::get_element_by_id(id)->remove();
             m_open = false;
             if(on_close) { on_close(); }
+            if(on_state_change) { on_state_change(); }
         }
 
         void open() {
@@ -180,8 +197,15 @@ export class Window {
             setup(initial_x, initial_y);
             m_open = true;
             if(on_open) { on_open(); }
+            if(on_state_change) { on_state_change(); }
         }
 
+        const std::string& get_title() const {
+            return m_title;
+        }
+        const std::string& get_icon() const {
+            return m_icon;
+        }
         bool is_open() const {
             return m_open;
         }
@@ -191,6 +215,15 @@ export class Window {
         int get_y() const {
             return m_y;
         }
+        window_state get_state() const {
+            if(!m_open)
+                return window_state::closed;
+            if(is_minimized)
+                return window_state::minimized;
+            if(is_maximized)
+                return window_state::maximized;
+            return window_state::normal;
+        }
 
         ActionHandlerList<> on_open;
         ActionHandlerList<> on_close;
@@ -199,6 +232,7 @@ export class Window {
         ActionHandlerList<bool> on_maximize;
         ActionHandlerList<> on_restore;
         ActionHandlerList<int, int> on_move;
+        ActionHandlerList<> on_state_change;
 
         static void setup() {
             webpp::document.add_event_listener("mouseup", global_mouseup);
@@ -212,6 +246,9 @@ export class Window {
         bool m_open = false;
         int m_x = 0;
         int m_y = 0;
+
+        bool is_minimized = false;
+        bool is_maximized = false;
 
         static inline int highest_z_index = 1;
         static inline int grab_start_x = 0;
