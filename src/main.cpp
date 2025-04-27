@@ -161,6 +161,27 @@ namespace windows {
                         ") for rendering and ",
                         code{"glibmm"},"&amp;",code{"giomm"}," for everything else."
                 }},
+                Project{"cutie-logs", "https://github.com/JnCrMx/cutie-logs",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/cutie-logs"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/cutie-logs"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/29"}},
+                    fragment{
+                        "A simple and lightweight OpenTelemetry log server combining collection, storage and analysis.<br>",
+                        b{"Features:"}, ul{{_class{"columns-3"}},
+                            li{"PostgreSQL database"},
+                            li{"displaying and downloading logs as text"},
+                            li{"displaying logs and attributes in a table"},
+                            li{"powerful stencils to define log formats"},
+                            li{"stencil functions for transforming attributes"},
+                            li{"integrated IP lookup on frontend and backend"},
+                            li{"multiple profiles for different applications"},
+                            li{{_class{"gray"}}, "planned: rules for automatic cleanup"},
+                            li{{_class{"gray"}}, "planned: rules for server-side custom attributes"},
+                            li{{_class{"gray"}}, "planned: rules for server-side redaction"},
+                        },
+                        i{"Fun Fact: This application is &quot;full-stack&quot; C++, as it is used for both backend and frontend."},
+                    }
+                },
                 Project{"website", "https://jcm.re",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/website"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/website"},
@@ -169,12 +190,6 @@ namespace windows {
                         b{"This very website you are visiting right now!"}, "<br>"
                         "It is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library. Look at the \"Source Code\" window for more information."
                 }},
-                Project{"webpp", "https://github.com/JnCrMx/webpp",
-                    {{LinkType::GitHub, "https://github.com/JnCrMx/webpp"},
-                     {LinkType::GitHug, "https://git.jcm.re/jcm/webpp"}},
-                    "A simple C++ library for interacting with the DOM and other browser APIs.<br>"
-                    "It is used in this website for handling events, creating elements, making fetch requests and much more."
-                },
                 Project{"cpp-toy-os", "https://github.com/JnCrMx/cpp-toy-os",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-toy-os"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/cutie-os"},
@@ -204,13 +219,6 @@ namespace windows {
                             li{a{{_href{"https://git.jcm.re/cheeky-imp/cheeky-dbus"}, _target{"_blank"}}, "cheeky-dbus"}, " for interacting with D-Bus services"},
                         }
                 }},
-                Project{"gpgfs", "https://github.com/JnCrMx/gpgfs",
-                    {{LinkType::GitHub, "https://github.com/JnCrMx/gpgfs"},
-                     {LinkType::GitHug, "https://git.jcm.re/jcm/gpgfs"},
-                     {LinkType::CI, "https://woodpecker.jcm.re/repos/21"}},
-                    "A FUSE filesystem that decrypts files on the access using GnuPG.<br>"
-                    "I mainly use it for keeping credential files encrypted at rest."
-                },
                 Project{"chocobotpp", "https://github.com/JnCrMx/chocobotpp",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/chocobotpp"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/chocobotpp"},
@@ -229,10 +237,23 @@ namespace windows {
                             li{"freely definable command aliases"},
                         },
                 }},
+                Project{"webpp", "https://github.com/JnCrMx/webpp",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/webpp"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/webpp"}},
+                    "A simple C++ library for interacting with the DOM and other browser APIs.<br>"
+                    "It is used in this website for handling events, creating elements, making fetch requests and much more."
+                },
                 Project{"cpp-snippets", "https://github.com/JnCrMx/cpp-snippets",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-snippets"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/cpp-snippets"}},
                     "A collection of useful C++ snippets."
+                },
+                Project{"gpgfs", "https://github.com/JnCrMx/gpgfs",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/gpgfs"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/gpgfs"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/21"}},
+                    "A FUSE filesystem that decrypts files on the access using GnuPG.<br>"
+                    "I mainly use it for keeping credential files encrypted at rest."
                 },
                 Project{"dreamrender", "https://github.com/JnCrMx/dreamrender",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/dreamrender"},
