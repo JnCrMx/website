@@ -19,11 +19,13 @@
     <script type="module">
         import { instantiateStreaming } from "./webpp.js";
         async function init() {
-            const { instance } = await instantiateStreaming(
-                fetch("./website.wasm")
-            );
+            const { instance, functions } = await instantiateStreaming(fetch("./website.wasm"));
             instance.exports._initialize();
             instance.exports.main();
+
+            window.handleEvent = function(element, event, callback) {
+                functions.invoke_callback(callback, functions.create_object_ref(event));
+            }
         }
         init();
     </script>

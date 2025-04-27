@@ -7,6 +7,14 @@ import utils;
 import components;
 import c_interpreter;
 
+namespace Webxx {
+    constexpr static char onClickAttr[] = "onclick";
+    using _onClick = attr<onClickAttr>;
+
+    constexpr static char dataWindowIdAttr[] = "data-window-id";
+    using _dataWindowId = attr<dataWindowIdAttr>;
+}
+
 namespace files {
     constexpr char src_main[] = { // secrets in this file will be optimized away :D
         #embed "src/main.cpp"
@@ -59,7 +67,7 @@ constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), s
 namespace windows {
     using namespace Webxx;
 
-    Window about_me{"about_me", "About Me", [](){
+    Window about_me{"about_me", "About Me", "images/about_me.png", [](){
         return fragment{
             h1{"JCM"},
             p{"I'm a software developer and computer engineering student."},
@@ -80,7 +88,7 @@ namespace windows {
             p{"P.S.: I love Cyndi~! 🩷🩵"},
         };
     }};
-    Window projects{"projects", "Projects", [](){
+    Window projects{"projects", "Projects", "images/projects.png", [](){
         enum class LinkType {
             GitHub,
             GitHug,
@@ -234,12 +242,12 @@ namespace windows {
             },
         };
     }};
-    Window blog{"blog", "Blog", [](){
+    Window blog{"blog", "Blog", "images/blog.png", [](){
         return fragment{
             dv{{_id{"blog_container"}}}
         };
     }};
-    Window source_code{"source_code", "Source Code", [](){
+    Window source_code{"source_code", "Source Code", "images/source_code.png", [](){
         return fragment{
             p{
                 "This website is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library.<br>",
@@ -255,7 +263,7 @@ namespace windows {
             },
         };
     }};
-    Window licenses{"licenses", "Licenses", [](){
+    Window licenses{"licenses", "Licenses", "images/licenses.png", [](){
         return fragment{
             ul{ {_class{"licenses"}},
                 li{details{
@@ -269,7 +277,7 @@ namespace windows {
             },
         };
     }};
-    Window build_info{"build_info", "Build Info", [](){
+    Window build_info{"build_info", "Build Info", "images/build_info.png", [](){
         return fragment{
             "Build from commit ",
             a{{_href{std::format("https://git.jcm.re/jcm/website/commit/{}", files::views::git_commit_hash)}, _target{"blank"}},
@@ -281,14 +289,14 @@ namespace windows {
             )
         };
     }};
-    Window c_interpreter{"c_interpreter", "C Interpreter", [](){
+    Window c_interpreter{"c_interpreter", "C Interpreter", "images/c_interpreter.png", [](){
         return fragment{
             textarea{{_id{"c_interpreter_input"}, _placeholder{"Enter C code here..."}, _rows{"10"}, _cols{"80"}}},
             button{{_id{"c_interpreter_submit"}}, "Run"},
             textarea{{_id{"c_interpreter_output"}, _readonly{""}, _rows{"10"}, _cols{"80"}}},
         };
     }};
-    Window cyndi{"cyndi", "Cyndi", [](){
+    Window cyndi{"cyndi", "Cyndi", "images/cyndi.png", [](){
         return fragment{
             h1{"I love you 🩷"},
             dv{{_id{"secret_content"}},
@@ -310,12 +318,56 @@ static std::array all_windows = {
     &windows::cyndi,
 };
 
-auto page() {
+auto render_dock() {
+    using js_handle = std::decay_t<decltype(std::declval<webpp::event>().handle())>;
+    static webpp::callback_data on_click{[](js_handle handle, std::string_view){
+        webpp::event event{handle};
+
+        auto id = event["target"]["dataset"]["windowId"].as<std::string>();
+        if(!id || id->empty()) {
+            return;
+        }
+        webpp::log("Clicked on window: {}", *id);
+
+        Window* w = nullptr;
+        for(auto& win : all_windows) {
+            if(win->id == *id) {
+                w = win;
+                break;
+            }
+        }
+        if(!w) {
+            return;
+        }
+
+        w->toggle_minimize();
+        w->bring_to_front();
+    }, false};
+
     using namespace Webxx;
     return fragment{
         dv{{_id{"dock"}},
+            each(all_windows, [](Window* w) {
+                if(!w->is_open()) {
+                    return fragment{};
+                }
 
-        },
+                return fragment{button{{
+                        _dataWindowId{w->id},
+                        _onClick{std::format("handleEvent(this, event, {});", reinterpret_cast<std::uintptr_t>(&on_click))},
+                        _style{std::format("background-image: url('{}');", w->get_icon())}
+                    },
+                    dv{{_class{"tooltip"}}, w->get_title()}
+                }};
+            })
+        }
+    };
+}
+
+auto page() {
+    using namespace Webxx;
+    return fragment{
+        render_dock(),
         h1{"Hello from JCM!"},
         dv{{_id{"close_message"}}},
     };
@@ -410,6 +462,8 @@ int my_main() {
         windows::build_info.open(50, 800);
         //windows::c_interpreter.open(400, 100);
 
+        webpp::get_element_by_id("dock")->inner_html(Webxx::render(render_dock()));
+
         std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
         bool cyndi = hash == "#cyndi";
         if(cyndi) {
@@ -428,6 +482,8 @@ int my_main() {
     }());
 
     auto close_handler = []() {
+        webpp::get_element_by_id("dock")->inner_html(Webxx::render(render_dock()));
+
         bool all_closed = true;
         for(auto& w : all_windows) {
             if(w->is_open()) {
@@ -464,6 +520,8 @@ int my_main() {
                     last = r;
 
                     reopen_button.inner_text(messages[r]);
+
+                    co_await next_tick();
                     co_await reopen_button.event("click");
                 }
 
@@ -475,6 +533,8 @@ int my_main() {
                 windows::licenses.open();
                 windows::build_info.open();
                 //windows::c_interpreter.open();
+
+                webpp::get_element_by_id("dock")->inner_html(Webxx::render(render_dock()));
                 co_return;
             }());
         }

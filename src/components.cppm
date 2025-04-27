@@ -71,9 +71,16 @@ struct ActionHandlerList {
 
 export class Window {
     public:
-        constexpr Window(std::string&& id, std::string&& title, std::add_pointer_t<Webxx::fragment()> content) :
-            id(id), m_title(title), m_content(content) {}
+        constexpr Window(std::string&& id, std::string&& title, std::string&& icon, std::add_pointer_t<Webxx::fragment()> content) :
+            id(id), m_title(title), m_icon(icon), m_content(content) {}
         const std::string id;
+
+        const std::string& get_title() const {
+            return m_title;
+        }
+        const std::string& get_icon() const {
+            return m_icon;
+        }
 
         auto render_window(int x = 0, int y = 0) {
             using namespace Webxx;
@@ -200,6 +207,7 @@ export class Window {
 
     private:
         std::string m_title;
+        std::string m_icon;
         std::add_pointer_t<Webxx::fragment()> m_content;
         bool m_open = false;
         int m_x = 0;

@@ -14,6 +14,7 @@ export namespace Webxx {
 
     using Webxx::component;
     using Webxx::fragment;
+    using Webxx::attr;
 
     using Webxx::a;
     using Webxx::abbr;
