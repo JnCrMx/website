@@ -171,7 +171,12 @@ export class Window {
             if(on_state_change) { on_state_change(); }
         }
         void move(int x, int y) {
+            auto html_element = webpp::document.document_element();
             auto e = *webpp::get_element_by_id(id);
+
+            x = std::clamp(x, html_element.client_left()+1, html_element.client_width() - e.offset_width()-1);
+            y = std::clamp(y, html_element.client_top()+1, html_element.client_height() - e.offset_height()-1);
+
             e.style()["left"] = std::format("{}px", x);
             e.style()["top"] = std::format("{}px", y);
             m_x = x;
