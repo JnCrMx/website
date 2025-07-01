@@ -49,8 +49,8 @@ target_compile_features(tinyxml2Module PUBLIC cxx_std_26)
 target_link_libraries(tinyxml2Module PUBLIC tinyxml2::tinyxml2)
 
 add_library(stdModule STATIC)
-target_sources(stdModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS /usr/lib/llvm-19/share/libc++/v1/
-    FILES /usr/lib/llvm-19/share/libc++/v1/std.cppm)
+target_sources(stdModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS /usr/lib/llvm-20/share/libc++/v1/
+    FILES /usr/lib/llvm-20/share/libc++/v1/std.cppm)
 target_compile_features(stdModule PUBLIC cxx_std_26)
 # The standard library may use reserved identifiers
 target_compile_options(stdModule PRIVATE -Wno-reserved-identifier)
