@@ -13,9 +13,6 @@ when:
   - event: push
   - event: manual
 
-labels:
-  compat: riscv64
-
 steps:
   build:
     image: ubuntu:rolling
