@@ -190,6 +190,16 @@ namespace windows {
                         b{"This very website you are visiting right now!"}, "<br>"
                         "It is mostly written in C++ 26 using WASM and the ", code{"webxx"}, " library. Look at the \"Source Code\" window for more information."
                 }},
+                Project{"aom-sd-controller-fix", "https://github.com/JnCrMx/aom-sd-controller-fix",
+                    {{LinkType::GitHub, "https://github.com/JnCrMx/aom-sd-controller-fix"},
+                     {LinkType::GitHug, "https://git.jcm.re/jcm/aom-sd-controller-fix"},
+                     {LinkType::CI, "https://woodpecker.jcm.re/repos/33"}},
+                    fragment{
+                        "A patch for ", a{{_href{"https://store.steampowered.com/app/304530/Agents_of_Mayhem/"}, _target{"_blank"}}, "Agents of Mayhem"}, ", that prevents a crash on Steam Deck with Steam Input "
+                        "and therefore allows you to play the game with proper controller inputs.<br>"
+                        "In the future, I will try to add more fixes and features to this!"
+                    }
+                },
                 Project{"cpp-toy-os", "https://github.com/JnCrMx/cpp-toy-os",
                     {{LinkType::GitHub, "https://github.com/JnCrMx/cpp-toy-os"},
                      {LinkType::GitHug, "https://git.jcm.re/jcm/cutie-os"},
