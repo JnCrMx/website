@@ -79,6 +79,12 @@ ul.licenses {
     border: 1px solid #444;
 }
 
+.columns-2 {
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    width: fit-content;
+}
 .columns-3 {
     columns: 3;
     -webkit-columns: 3;
@@ -163,6 +169,10 @@ ul.licenses {
     margin: 0;
 }
 
+.project-header {
+    white-space: nowrap;
+}
+
 .project-links {
     display: inline;
 }
@@ -174,6 +184,25 @@ ul.licenses {
     height: 1.5em;
     vertical-align: text-bottom;
 }
+
+.project-tags {
+    display: inline;
+    margin-left: 0.5em;
+    vertical-align: text-top;
+}
+.project-tags a {
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+
+    margin: 0.1em;
+    border-radius: 1em;
+    color: white;
+    font-size: 0.8em;
+    vertical-align: middle;
+}
+
 #ganyu {
     position: absolute;
 }
