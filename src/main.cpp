@@ -643,6 +643,7 @@ int my_main() {
                 }
 
                 webpp::get_element_by_id("close_message")->inner_html("");
+                windows::recommendations.open();
                 windows::blog.open();
                 windows::about_me.open();
                 windows::projects.open();
