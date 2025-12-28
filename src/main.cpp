@@ -570,8 +570,6 @@ int my_main() {
         windows::build_info.open(50, 800);
         //windows::c_interpreter.open(400, 100);
 
-        webpp::get_element_by_id("dock_container")->inner_html(Webxx::render(render_dock()));
-
         std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
         bool cyndi = hash == "#cyndi";
         if(cyndi) {
@@ -586,6 +584,9 @@ int my_main() {
                 }
             }
         }
+
+        webpp::get_element_by_id("dock_container")->inner_html(Webxx::render(render_dock()));
+
         co_return;
     }());
 
