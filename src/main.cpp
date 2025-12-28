@@ -348,6 +348,11 @@ namespace windows {
             dv{{_id{"blog_container"}}}
         };
     }};
+    Window recommendations{"recommendations", "Recommendations", "images/recommendations.png", [](){
+        return fragment{
+
+        };
+    }};
     Window source_code{"source_code", "Source Code", "images/source_code.png", [](){
         return fragment{
             p{
@@ -412,6 +417,7 @@ static std::array all_windows = {
     &windows::about_me,
     &windows::projects,
     &windows::blog,
+    &windows::recommendations,
     &windows::source_code,
     &windows::licenses,
     &windows::build_info,
@@ -562,6 +568,8 @@ int my_main() {
     Window::setup();
     webpp::coro::submit([]() -> webpp::coroutine<void> {
         co_await webpp::coro::next_tick();
+
+        windows::recommendations.open(120, 400);
         windows::blog.open(400, 450);
         windows::about_me.open(75, 50);
         windows::projects.open(800, 100);

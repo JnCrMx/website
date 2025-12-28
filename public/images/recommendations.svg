@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="192"
+   height="192"
+   viewBox="0 0 50.8 50.800002"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="recommendations.svg"
+   inkscape:export-filename="recommendations.png"
+   inkscape:export-xdpi="64"
+   inkscape:export-ydpi="64"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.7515263"
+     inkscape:cx="81.772797"
+     inkscape:cy="95.038162"
+     inkscape:window-width="1854"
+     inkscape:window-height="1011"
+     inkscape:window-x="1986"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-53.840919,-38.21318)">
+    <path
+       style="font-size:50.8px;font-family:'UbuntuSans Nerd Font';-inkscape-font-specification:'UbuntuSans Nerd Font';white-space:pre;fill:#c6c5c6;fill-opacity:1;stroke-width:0.248047"
+       d="m 79.240907,82.231155 1.000125,1.952624 c -0.3175,0.15875 -0.66675,0.238125 -1.04775,0.238125 -0.34925,0.03175 -0.66675,-0.04762 -0.9525,-0.238125 h -0.04762 l -0.04762,-0.04763 c -0.3175,-0.158749 -0.619125,-0.3175 -0.904875,-0.47625 -3.65125,-2.063749 -7.064374,-4.460875 -10.239374,-7.191374 -1.174751,-1.016 -2.286,-2.047875 -3.33375,-3.095625 -1.016,-1.04775 -2.047875,-2.25425 -3.095625,-3.6195 -1.04775,-1.36525 -1.93675,-2.7305 -2.667,-4.09575 -0.73025,-1.396999 -1.3335,-2.920999 -1.80975,-4.572 -0.4445,-1.651 -0.66675,-3.286125 -0.66675,-4.905374 0,-1.936751 0.34925,-3.7465 1.047751,-5.429249 0.73025,-1.68275 1.68275,-3.095625 2.8575,-4.238625 1.17475,-1.17475 2.524125,-2.079625 4.048125,-2.714625 1.524,-0.66675 3.095625,-1.000125 4.714874,-1.000125 2.254249,0 4.349749,0.53975 6.2865,1.61925 1.936749,1.0795 3.555999,2.54 4.85775,4.3815 1.30175,-1.87325 2.921,-3.33375 4.85775,-4.3815 1.968499,-1.0795 4.063999,-1.61925 6.2865,-1.61925 1.619249,0 3.190874,0.333375 4.714874,1.000125 1.524,0.635 2.873376,1.539875 4.048126,2.714625 1.174752,1.143 2.111372,2.555875 2.809872,4.238625 0.73025,1.682749 1.09538,3.492498 1.09538,5.429249 0,1.619249 -0.23813,3.254374 -0.71438,4.905374 -0.44449,1.651001 -1.03187,3.175001 -1.76212,4.572 -0.730249,1.36525 -1.619252,2.7305 -2.667003,4.09575 -1.04775,1.36525 -2.0955,2.57175 -3.14325,3.6195 -1.015999,1.04775 -2.111374,2.079625 -3.286124,3.095625 -3.460751,2.95275 -7.175501,5.508625 -11.14425,7.667624 l -0.04763,0.04763 h -0.04762 z"
+       id="text1"
+       aria-label="♥"
+       sodipodi:nodetypes="cccccccccsccscccssccscccsccscccccc" />
+  </g>
+</svg>
