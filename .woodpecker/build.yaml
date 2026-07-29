@@ -1,11 +1,11 @@
 variables:
   - &minio-settings
     access_key:
-      from_secret: minio_access_key
+      from_secret: s3_access_key
     secret_key:
-      from_secret: minio_secret_key
+      from_secret: s3_secret_key
     endpoint:
-      from_secret: minio_endpoint
+      from_secret: s3_endpoint
     path_style: true
     region: eu-central-jcm
 
@@ -33,16 +33,6 @@ steps:
       - cmake --build build --parallel=2 2>&1 | tee build/cmake-build.log
       - cp -L -r public build/public # this will dereference symlinks
       - wasm-strip build/public/website.wasm
-  upload-logs:
-    image: woodpeckerci/plugin-s3
-    settings:
-      <<: *minio-settings
-      bucket: woodpecker
-      source: build/cmake-*.log
-      strip_prefix: build/
-      target: /artifacts/${CI_REPO}/${CI_PIPELINE_NUMBER}/public/
-    when:
-      - status: [ success, failure ]
   upload-website:
     image: appleboy/drone-scp
     settings:
@@ -57,3 +47,13 @@ steps:
       target: /config/data/website
       source: build/public/
       strip_components: 2
+  upload-logs:
+    image: woodpeckerci/plugin-s3
+    settings:
+      <<: *minio-settings
+      bucket: woodpecker
+      source: build/cmake-*.log
+      strip_prefix: build/
+      target: /artifacts/${CI_REPO}/${CI_PIPELINE_NUMBER}/public/
+    when:
+      - status: [ success, failure ]
