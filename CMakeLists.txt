@@ -65,6 +65,17 @@ set(MODULE_SOURCES
     src/components.cppm
     src/utils.cppm
     src/c_interpreter.cppm
+    src/windows/_module.cppm
+    src/windows/about_me.cppm
+    src/windows/blog.cppm
+    src/windows/calendar.cppm
+    src/windows/projects.cppm
+    src/windows/recommendations.cppm
+    src/windows/source_code.cppm
+    src/windows/licenses.cppm
+    src/windows/build_info.cppm
+    src/windows/c_interpreter.cppm
+    src/windows/cyndi.cppm
 )
 
 add_executable(website ${SOURCES})

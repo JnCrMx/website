@@ -1,0 +1,12 @@
+export module windows;
+
+export import :about_me;
+export import :projects;
+export import :blog;
+export import :calendar;
+export import :recommendations;
+export import :source_code;
+export import :licenses;
+export import :build_info;
+export import :c_interpreter;
+export import :cyndi;
