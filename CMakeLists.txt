@@ -76,6 +76,7 @@ set(MODULE_SOURCES
     src/windows/build_info.cppm
     src/windows/c_interpreter.cppm
     src/windows/cyndi.cppm
+    src/windows/feedback.cppm
 )
 
 add_executable(website ${SOURCES})

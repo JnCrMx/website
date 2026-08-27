@@ -10,3 +10,4 @@ export import :licenses;
 export import :build_info;
 export import :c_interpreter;
 export import :cyndi;
+export import :feedback;

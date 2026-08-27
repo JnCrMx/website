@@ -23,6 +23,7 @@ static std::array all_windows = {
     &windows::build_info,
     //&windows::c_interpreter,
     &windows::cyndi,
+    &windows::feedback,
 };
 
 auto render_dock() {
@@ -181,6 +182,7 @@ int my_main() {
         windows::licenses.open(100, 550);
         windows::build_info.open(50, 800);
         //windows::c_interpreter.open(400, 100);
+        windows::feedback.open(400, 500);
 
         if(cyndi) {
             windows::cyndi.open(500, 250);
