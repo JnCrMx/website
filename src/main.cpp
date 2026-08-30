@@ -179,10 +179,10 @@ int my_main() {
         windows::about_me.open(75, 50);
         windows::projects.open(800, 100);
         windows::source_code.open(900, 500);
-        windows::licenses.open(100, 550);
-        windows::build_info.open(50, 800);
+        windows::licenses.open(100, 450);
+        windows::build_info.open(900, 850);
         //windows::c_interpreter.open(400, 100);
-        windows::feedback.open(400, 500);
+        windows::feedback.open(100, 650);
 
         if(cyndi) {
             windows::cyndi.open(500, 250);
