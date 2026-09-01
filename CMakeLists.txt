@@ -70,7 +70,7 @@ set(MODULE_SOURCES
     src/windows/blog.cppm
     src/windows/calendar.cppm
     src/windows/projects.cppm
-    src/windows/recommendations.cppm
+    src/windows/buttons.cppm
     src/windows/source_code.cppm
     src/windows/licenses.cppm
     src/windows/build_info.cppm

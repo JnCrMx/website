@@ -4,7 +4,7 @@ export import :about_me;
 export import :projects;
 export import :blog;
 export import :calendar;
-export import :recommendations;
+export import :buttons;
 export import :source_code;
 export import :licenses;
 export import :build_info;

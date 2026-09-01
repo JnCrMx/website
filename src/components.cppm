@@ -196,7 +196,7 @@ export class Window {
 
         void open(int initial_x, int initial_y) {
             std::string html = Webxx::render(render_window(initial_x, initial_y));
-            auto el = webpp::create_element_from_html(html);
+            auto el = webpp::create_element_from_html(std::move(html));
             webpp::get_element_by_id("main")->append_child(*el);
 
             setup(initial_x, initial_y);

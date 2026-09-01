@@ -253,3 +253,10 @@ ul.licenses {
 #dock button:hover .tooltip {
     display: block;
 }
+
+/* Shamelessly stolen from a cute bot: https://www.5snb.club/w/88x31-tips/ */
+.button-large {
+    image-rendering: pixelated;
+    width: calc(88px * 2);
+    height: calc(31px * 2);
+}

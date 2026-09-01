@@ -17,7 +17,7 @@ static std::array all_windows = {
     &windows::projects,
     &windows::blog,
     &windows::calendar,
-    //&windows::recommendations,
+    &windows::buttons,
     &windows::source_code,
     &windows::licenses,
     &windows::build_info,
@@ -173,13 +173,13 @@ int my_main() {
     webpp::coro::submit([]() -> webpp::coroutine<void> {
         co_await webpp::coro::next_tick();
 
-        //windows::recommendations.open(120, 400);
+        windows::buttons.open(120, 400);
         windows::blog.open(400, 450);
-        windows::calendar.open(600, 150);
         windows::about_me.open(75, 50);
+        windows::calendar.open(600, 150);
         windows::projects.open(800, 100);
         windows::source_code.open(900, 500);
-        windows::licenses.open(100, 450);
+        windows::licenses.open(100, 500);
         windows::build_info.open(900, 850);
         //windows::c_interpreter.open(400, 100);
         windows::feedback.open(100, 650);
