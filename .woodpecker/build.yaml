@@ -21,9 +21,10 @@ steps:
       - apt-get update
       - >-
         DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
-        cmake git ca-certificates ninja-build
+        cmake git ca-certificates ninja-build curl pngcrush
         clang-20 clang-tools-20 lld-20 llvm-20 wabt
         libc++-20-dev libc++-20-dev-wasm32 libclang-rt-20-dev-wasm32
+      - .woodpecker/download_buttons.sh
       - mkdir build
       - >-
         cmake -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel
