@@ -69,7 +69,7 @@ namespace windows {
     constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true) {
         return a{{_href{target}, _target{"_blank"}},
             img{{
-                _src{std::format("/public/buttons/{}", name)},
+                _src{std::format("/buttons/{}", name)},
                 _alt{alt},
                 _width{"88"},
                 _height{"31"},
