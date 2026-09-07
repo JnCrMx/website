@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tail -n-1 src/windows/buttons.tsv | while read line; do
+tail -n+2 src/windows/buttons.tsv | while read line; do
     name="$(echo "$line" | cut -f1)"
     url="$(echo "$line" | cut -f3)"
 
