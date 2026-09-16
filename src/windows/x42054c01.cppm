@@ -22,8 +22,9 @@ namespace windows {
 
         using std::literals::operator""s;
         using std::literals::operator""sv;
+        static std::unique_ptr<webpp::websocket> ws;
         w.on_open += []() {
-            static webpp::websocket ws = webpp::websocket::create("wss://x42054c01.d.jcm.re/ws");
+            ws = std::make_unique<webpp::websocket>(webpp::websocket::create("wss://x42054c01.d.jcm.re/ws"));
             static bool error = false;
 
             static auto get_sliders = [](){
@@ -32,7 +33,10 @@ namespace windows {
                     std::views::transform([](unsigned int i){return *webpp::get_element_by_id(std::format("x42054c01_slider_{}", i+1));});
             };
 
-            ws.on_message([](webpp::event e){
+            ws->on_message([](webpp::event e){
+                if(!x42054c01.is_open()) {
+                    return;
+                }
                 auto message = *e["data"].as<std::string>();
                 auto view = message |
                     std::views::split(" "sv) |
@@ -46,6 +50,9 @@ namespace windows {
             });
 
             static auto update = [](){
+                if(!x42054c01.is_open()) {
+                    return;
+                }
                 auto message = get_sliders() |
                     std::views::transform([](auto&& a){return *a["value"].template as<int>();}) |
                     std::views::transform([](auto&& a){return std::to_string(a) + " ";}) |
@@ -54,11 +61,14 @@ namespace windows {
                 std::string_view message_view{message};
                 message_view.remove_suffix(1);
 
-                ws.send(message_view);
+                ws->send(message_view);
             };
 
             static std::vector<webpp::callback_data*> slider_listeners;
-            ws.on_open([](webpp::event e){
+            ws->on_open([](webpp::event e){
+                if(!x42054c01.is_open()) {
+                    return;
+                }
                 auto status = *webpp::get_element_by_id("x42054c01_status");
                 status.inner_text("Connected!");
                 status.style()["color"] = "#007700";
@@ -70,27 +80,39 @@ namespace windows {
                     s["disabled"] = false;
                 }
             });
-            ws.on_error([](webpp::event e){
+            ws->on_error([](webpp::event e){
+                if(!x42054c01.is_open()) {
+                    return;
+                }
                 auto status = *webpp::get_element_by_id("x42054c01_status");
                 status.inner_text("Failed to connect.");
                 status.style()["color"] = "#FF0000";
                 error = true;
             });
-            ws.on_close([](webpp::event e){
+            ws->on_close([](webpp::event e){
+                for(auto* cb : slider_listeners) {
+                    cb->abandon();
+                }
+                slider_listeners.clear(); // we leak memory here, but that is kinda okay I guess
+
+                if(!x42054c01.is_open()) {
+                    return;
+                }
                 if(!error) {
                     auto status = *webpp::get_element_by_id("x42054c01_status");
                     status.inner_text("Disconnected.");
                     status.style()["color"] = "#FF0000";
                 }
-
-                for(auto* cb : slider_listeners) {
-                    cb->abandon();
-                }
-                slider_listeners.clear(); // we leak memory here, but that is kinda okay I guess
                 for(auto s : get_sliders()) {
                     s["disabled"] = true;
                 }
             });
+        };
+        w.on_close += [](){
+            if(ws) {
+                ws->close();
+                ws.reset();
+            }
         };
         return w;
     }();
