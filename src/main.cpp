@@ -24,6 +24,7 @@ static std::array all_windows = {
     //&windows::c_interpreter,
     &windows::cyndi,
     &windows::feedback,
+    &windows::x42054c01,
 };
 
 auto render_dock() {
@@ -168,6 +169,7 @@ int my_main() {
 
     static std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
     static bool cyndi = hash == "#cyndi";
+    static bool x42054c01 = hash == "#x42054c01";
 
     Window::setup();
     webpp::coro::submit([]() -> webpp::coroutine<void> {
@@ -186,6 +188,8 @@ int my_main() {
 
         if(cyndi) {
             windows::cyndi.open(500, 250);
+        } else if(x42054c01) {
+            windows::x42054c01.open(500, 250);
         } else if(hash.size() > 1) {
             auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
             for(auto& w : all_windows) {
@@ -249,6 +253,9 @@ int my_main() {
                 webpp::get_element_by_id("close_message")->inner_html("");
                 for(auto* window : all_windows) {
                     if(window == &windows::cyndi && !cyndi) {
+                        continue;
+                    }
+                    if(window == &windows::x42054c01 && !x42054c01) {
                         continue;
                     }
                     window->open();

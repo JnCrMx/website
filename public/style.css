@@ -45,6 +45,11 @@ input {
     border: 1px solid #444;
     margin: 5px;
 }
+input[type="range"] {
+    border-radius: initial;
+    padding: initial;
+    border: initial;
+}
 button {
     border-radius: 9px;
     padding: 5px;

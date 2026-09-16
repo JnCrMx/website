@@ -39,7 +39,8 @@ static constexpr auto src_main_sanitised_array = [](){
     constexpr auto s3 = utils::replace_sub_str<s2, std::to_array(">"), std::to_array("&gt;")>();
     constexpr auto s4 = utils::replace_sub_str<s3, std::to_array("cyndi"), std::to_array("secret")>();
     constexpr auto s5 = utils::replace_sub_str<s4, std::to_array("Cyndi"), std::to_array("secret")>();
-    return s5;
+    constexpr auto s6 = utils::replace_sub_str<s5, std::to_array("x42054c01"), std::to_array("secret")>();
+    return s6;
 }();
 static constexpr std::string_view src_main_sanitised{src_main_sanitised_array.data(), src_main_sanitised_array.size()};
 

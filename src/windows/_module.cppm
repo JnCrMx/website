@@ -11,3 +11,4 @@ export import :build_info;
 export import :c_interpreter;
 export import :cyndi;
 export import :feedback;
+export import :x42054c01;
