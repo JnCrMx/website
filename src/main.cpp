@@ -179,7 +179,7 @@ int my_main() {
         windows::calendar.open(600, 150);
         windows::projects.open(800, 100);
         windows::source_code.open(900, 500);
-        windows::licenses.open(100, 500);
+        windows::licenses.open(500, 700);
         windows::build_info.open(900, 850);
         //windows::c_interpreter.open(400, 100);
         windows::feedback.open(100, 650);
