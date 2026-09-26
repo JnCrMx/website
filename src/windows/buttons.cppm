@@ -69,7 +69,7 @@ namespace windows {
     constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true) {
         return a{{_href{target}, _target{"_blank"}},
             img{{
-                _src{std::format("/buttons/{}", name)},
+                _src{std::format("buttons/{}", name)},
                 _alt{alt},
                 _width{"88"},
                 _height{"31"},
@@ -85,10 +85,14 @@ namespace windows {
         return fragment{
             dv{
                 "I have a (for now badly made) 88x31 button! :D" "<br>",
-                b88x31("jcm.png", "jcm.re", "https://jcm.re"),
+                "My website is reachable under different names (hence two buttons), so pick whichever you prefer ;3",
+                p{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
+                    b88x31("jcm.pet.png", "jcm.pet", "https://jcm.pet"),
+                    b88x31("jcm.re.png", "jcm.re", "https://jcm.re"),
+                },
                 details{
                     summary{"Usage information"},
-                    "You can do the following things with the above button (with or without asking me first):",
+                    "You can do the following things with each of the above buttons (with or without asking me first):",
                     ul{
                         li{"embed it unmodified on your own website"},
                         li{"rehost it on your server and then embed the rehosted version on your website"},
