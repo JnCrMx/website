@@ -4,6 +4,8 @@ import std;
 import webxx;
 import components;
 
+#define constexpr_throw(message) __builtin_unreachable()
+
 namespace windows {
     using namespace Webxx;
 
@@ -34,30 +36,30 @@ namespace windows {
             e.large     = large == "true";
 
             if(e.name.empty()) {
-                static_cast<void>("\"name\" must not be empty"[-1]);
+                constexpr_throw("\"name\" must not be empty");
             }
             if(e.name.find_first_of("/:#?") != std::string_view::npos) {
-                static_cast<void>("\"name\" must not contain reserved characters"[-1]);
+                constexpr_throw("\"name\" must not contain reserved characters");
             }
             if(e.alt.empty()) {
-                static_cast<void>("\"alt\" must not be empty for accessibility reasons"[-1]);
+                constexpr_throw("\"alt\" must not be empty for accessibility reasons");
             }
             if(!e.target.starts_with("http://") && !e.target.starts_with("https://")) {
-                static_cast<void>("\"url\" must start with either \"https://\" or \"http://\""[-1]);
+                constexpr_throw("\"url\" must start with either \"https://\" or \"http://\"");
             }
             if(large != "true" && large != "false") {
-                static_cast<void>("\"friend\"/\"large\" must be either \"true\" or \"false\""[-1]);
+                constexpr_throw("\"friend\"/\"large\" must be either \"true\" or \"false\"");
             }
         }
         if(std::string_view{*(sv | std::views::split("\n"sv) | std::views::drop(count+1)).begin()} != "") {
-            static_cast<void>("file must end with a newline character"[-1]);
+            constexpr_throw("file must end with a newline character");
         }
 
         std::array<std::string_view, count> names; unsigned int i = 0;
         for(const auto& e : array){
             for(unsigned int j = 0; j < i; j++) {
                 if(e.name == names[j]) {
-                    static_cast<void>("all buttons should have unique names"[-1]);
+                    constexpr_throw("all buttons should have unique names");
                 }
             }
             names[i++] = e.name;
