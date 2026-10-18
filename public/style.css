@@ -265,3 +265,8 @@ ul.licenses {
     width: calc(88px * 2);
     height: calc(31px * 2);
 }
+
+.blog-title {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
