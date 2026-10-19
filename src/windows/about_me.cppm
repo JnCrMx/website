@@ -19,8 +19,6 @@ namespace windows {
                     img{{_src{"images/third_party/bluesky.png"}, _title{"Bluesky"}}}},
                 a{{_href{"https://wafrn.jcm.re/blog/jcm"}, _target{"_blank"}},
                     img{{_src{"images/third_party/wafrn.png"}, _title{"Wafrn"}}}},
-                a{{_href{"https://blog.jcm.re/"}, _target{"_blank"}},
-                    img{{_src{"images/third_party/blog.png"}, _title{"Blog"}}}},
                 a{{_href{"https://keys.openpgp.org/vks/v1/by-fingerprint/7B839F0DA64069DD7832BB802F536DE3E9EC3AD8"}, _target{"_blank"}},
                     img{{_src{"images/third_party/openpgp.png"}, _title{"OpenPGP"}}}},
             },
