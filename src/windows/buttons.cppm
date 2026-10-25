@@ -20,12 +20,19 @@ namespace windows {
     };
     constexpr static auto button_datas = [](){
         using std::literals::operator""sv;
+        constexpr auto filtered_lines = [&](){
+            constexpr auto skip_empty = [](auto a){return !std::string_view{a}.empty();};
+            constexpr auto skip_comments = [](auto a){return !std::string_view{a}.starts_with("#");};
+
+            constexpr std::string_view sv{buttons_tsv, sizeof(buttons_tsv)};
+            return std::views::split(sv, "\n"sv) | std::views::filter(skip_empty) | std::views::filter(skip_comments);
+        };
 
         constexpr std::string_view sv{buttons_tsv, sizeof(buttons_tsv)};
-        constexpr unsigned int count = std::ranges::distance(std::views::split(sv, "\n"sv)) - 2;
+        constexpr unsigned int count = std::ranges::distance(filtered_lines()) - 1;
 
         std::array<button_data, count> array{};
-        for(auto [l, i] : std::views::zip(sv | std::views::split("\n"sv) | std::views::drop(1) | std::views::take(count), std::views::iota(0))) {
+        for(auto [l, i] : std::views::zip(filtered_lines() | std::views::drop(1) | std::views::take(count), std::views::iota(0))) {
             auto& e = array[i];
             std::string_view lv{l};
 
@@ -50,9 +57,6 @@ namespace windows {
             if(large != "true" && large != "false") {
                 constexpr_throw("\"friend\"/\"large\" must be either \"true\" or \"false\"");
             }
-        }
-        if(std::string_view{*(sv | std::views::split("\n"sv) | std::views::drop(count+1)).begin()} != "") {
-            constexpr_throw("file must end with a newline character");
         }
 
         std::array<std::string_view, count> names; unsigned int i = 0;
