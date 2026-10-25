@@ -26,6 +26,7 @@ static std::array all_windows = {
     &windows::feedback,
     &windows::x42054c01,
 };
+static std::deque<Window*> phone_app_stack;
 
 auto render_dock() {
     using js_handle = std::decay_t<decltype(std::declval<webpp::event>().handle())>;
@@ -73,12 +74,26 @@ auto render_dock() {
     };
 }
 
+auto render_homescreen() {
+    using namespace Webxx;
+    return fragment{
+        dv{{_id{"homescreen"}},
+        }
+    };
+}
+
 auto page() {
     using namespace Webxx;
     return fragment{
         dv{{_id{"dock_container"}}, render_dock()},
         h1{"Hello from JCM!"},
         dv{{_id{"close_message"}}},
+        render_homescreen(),
+        dv{{_id{"navigation_bar"}},
+            button{{_id{"nav_overview"}}},
+            button{{_id{"nav_home"}}},
+            button{{_id{"nav_close"}}},
+        }
     };
 }
 
@@ -165,6 +180,13 @@ auto ganyu() -> webpp::coroutine<void> {
 [[clang::export_name("main")]]
 int my_main() {
     webpp::log("Hello World!");
+
+    static bool is_touch = *webpp::eval("window.matchMedia(\"(pointer: coarse)\").matches")["result"].as<bool>();
+    static bool is_portrait = *webpp::eval("window.matchMedia(\"(orientation: portrait)\").matches")["result"].as<bool>();
+    static bool phone_mode = is_touch || is_portrait;
+    webpp::log("We are in {} mode.", phone_mode ? "phone" : "desktop");
+    webpp::get_element_by_id("main")->add_class(phone_mode ? "phone" : "desktop");
+
     webpp::get_element_by_id("main")->inner_html(Webxx::render(page()));
 
     static std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
@@ -175,32 +197,65 @@ int my_main() {
     webpp::coro::submit([]() -> webpp::coroutine<void> {
         co_await webpp::coro::next_tick();
 
-        windows::buttons.open(120, 400);
-        windows::blog.open(400, 450);
-        windows::about_me.open(75, 50);
-        windows::calendar.open(600, 150);
-        windows::projects.open(800, 100);
-        windows::source_code.open(900, 500);
-        windows::licenses.open(500, 700);
-        windows::build_info.open(900, 850);
-        //windows::c_interpreter.open(400, 100);
-        windows::feedback.open(100, 650);
+        if(phone_mode) {
+            webpp::get_element_by_id("nav_home")->add_event_listener("click", [](webpp::event){
+                for(auto& w : all_windows) {
+                    if(w->is_open()) {
+                        w->minimize();
+                    }
+                }
+                phone_app_stack.clear();
+            });
+            webpp::get_element_by_id("nav_close")->add_event_listener("click", [](webpp::event){
+                if(!phone_app_stack.empty()) {
+                    phone_app_stack.back()->close();
+                    phone_app_stack.pop_back();
+                }
+            });
 
-        if(cyndi) {
-            windows::cyndi.open(500, 250);
-        } else if(x42054c01) {
-            windows::x42054c01.open(500, 250);
-        } else if(hash.size() > 1) {
-            auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
-            for(auto& w : all_windows) {
-                if(w->id == fullscreen_window_id) {
-                    w->maximize();
-                    w->bring_to_front();
-                    break;
+            if(cyndi) {
+                // TODO
+            } else if(x42054c01) {
+                // TODO
+            } else if(hash.size() > 1) {
+                auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
+                for(auto& w : all_windows) {
+                    if(w->id == fullscreen_window_id) {
+                        w->open(0, 0);
+                        w->maximize();
+                        w->bring_to_front();
+                        phone_app_stack.push_back(w);
+                        break;
+                    }
+                }
+            }
+        } else {
+            windows::buttons.open(120, 400);
+            windows::blog.open(400, 450);
+            windows::about_me.open(75, 50);
+            windows::calendar.open(600, 150);
+            windows::projects.open(800, 100);
+            windows::source_code.open(900, 500);
+            windows::licenses.open(500, 700);
+            windows::build_info.open(900, 850);
+            //windows::c_interpreter.open(400, 100);
+            windows::feedback.open(100, 650);
+
+            if(cyndi) {
+                windows::cyndi.open(500, 250);
+            } else if(x42054c01) {
+                windows::x42054c01.open(500, 250);
+            } else if(hash.size() > 1) {
+                auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
+                for(auto& w : all_windows) {
+                    if(w->id == fullscreen_window_id) {
+                        w->maximize();
+                        w->bring_to_front();
+                        break;
+                    }
                 }
             }
         }
-
         webpp::get_element_by_id("dock_container")->inner_html(Webxx::render(render_dock()));
 
         co_return;
@@ -276,12 +331,14 @@ int my_main() {
             webpp::get_element_by_id("dock_container")->style()["display"] = "unset";
         }
     };
-    for(auto& w : all_windows) {
-        w->on_close += close_handler;
-        w->on_state_change += state_change_handler;
-    }
 
-    webpp::coro::submit(ganyu());
+    if(!phone_mode) {
+        for(auto& w : all_windows) {
+            w->on_close += close_handler;
+            w->on_state_change += state_change_handler;
+        }
+        webpp::coro::submit(ganyu());
+    }
 
     return 0;
 }

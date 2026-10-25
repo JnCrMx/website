@@ -270,3 +270,42 @@ ul.licenses {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
+
+
+#main.phone #dock {
+    display: none;
+}
+#main.phone .titlebar button {
+    display: none;
+}
+#main.phone .window {
+    border: none;
+    border-radius: 0px;
+}
+
+#main.phone #navigation_bar {
+    display: flex;
+}
+#main.desktop #navigation_bar {
+    display: none;
+}
+#navigation_bar {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    height: 4em;
+    width: 100vw;
+    background-color: #000000AA;
+    z-index: 99999999;
+    gap: 1em;
+}
+#navigation_bar button {
+    width: 33%;
+    height: 100%;
+    border: none;
+    background: none;
+}
+
+#main.desktop #homescreen {
+    display: none;
+}
