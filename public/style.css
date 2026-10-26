@@ -271,7 +271,9 @@ ul.licenses {
     margin-bottom: 0.25em;
 }
 
-
+#main.phone {
+    overflow: hidden;
+}
 #main.phone #dock {
     display: none;
 }
@@ -281,6 +283,11 @@ ul.licenses {
 #main.phone .window {
     border: none;
     border-radius: 0px;
+}
+#main.phone .window.maximized {
+    position: fixed;
+    height: calc(100% - 4em);
+    max-height: calc(100% - 4em);
 }
 
 #main.phone #navigation_bar {
@@ -314,6 +321,8 @@ ul.licenses {
     width: 100%;
     grid-template-columns: repeat(3, 1fr);
     gap: 1em;
+    max-height: calc(100vh - 4em - 1.2*36px - 2*2em);
+    overflow: scroll;
 }
 #homescreen button {
     color: black;
