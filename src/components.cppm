@@ -75,7 +75,8 @@ export class Window {
             normal,
             minimized,
             maximized,
-            closed
+            closed,
+            hidden
         };
 
         constexpr Window(std::string&& id, std::string&& title, std::string&& icon, std::add_pointer_t<Webxx::fragment()> content) :
@@ -221,6 +222,8 @@ export class Window {
             return m_y;
         }
         window_state get_state() const {
+            if(m_hidden)
+                return window_state::hidden;
             if(!m_open)
                 return window_state::closed;
             if(is_minimized)
@@ -228,6 +231,13 @@ export class Window {
             if(is_maximized)
                 return window_state::maximized;
             return window_state::normal;
+        }
+
+        bool is_hidden() const {
+            return m_hidden;
+        }
+        void set_hidden(bool hidden) {
+            m_hidden = hidden;
         }
 
         ActionHandlerList<> on_open;
@@ -249,6 +259,7 @@ export class Window {
         std::string m_icon;
         std::add_pointer_t<Webxx::fragment()> m_content;
         bool m_open = false;
+        bool m_hidden = false;
         int m_x = 0;
         int m_y = 0;
 

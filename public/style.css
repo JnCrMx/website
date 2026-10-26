@@ -295,7 +295,7 @@ ul.licenses {
     left: 0px;
     height: 4em;
     width: 100vw;
-    background-color: #000000AA;
+    background-color: #333333;
     z-index: 99999999;
     gap: 1em;
 }
@@ -308,4 +308,25 @@ ul.licenses {
 
 #main.desktop #homescreen {
     display: none;
+}
+#homescreen {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1em;
+}
+#homescreen button {
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: none;
+    border-radius: 0;
+}
+#homescreen button:active {
+    background-color: rgba(127, 127, 127, 0.1);
+}
+#homescreen button img {
+    width: 100%;
+    height: 100%;
 }

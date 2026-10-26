@@ -33,7 +33,7 @@ auto render_dock() {
     static webpp::callback_data on_click{[](js_handle handle, std::string_view){
         webpp::event event{handle};
 
-        auto id = event["target"]["dataset"]["windowId"].as<std::string>();
+        auto id = event["currentTarget"]["dataset"]["windowId"].as<std::string>();
         if(!id || id->empty()) {
             return;
         }
@@ -75,9 +75,54 @@ auto render_dock() {
 }
 
 auto render_homescreen() {
+    using js_handle = std::decay_t<decltype(std::declval<webpp::event>().handle())>;
+    static webpp::callback_data on_click{[](js_handle handle, std::string_view){
+        webpp::event event{handle};
+
+        auto id = event["currentTarget"]["dataset"]["windowId"].as<std::string>();
+        if(!id || id->empty()) {
+            return;
+        }
+        webpp::log("Clicked on app: {}", *id);
+
+        Window* w = nullptr;
+        for(auto& win : all_windows) {
+            if(win->id == *id) {
+                w = win;
+                break;
+            }
+        }
+        if(!w) {
+            return;
+        }
+
+        if(!w->is_open()) {
+            w->open(0, 0);
+        }
+        w->restore();
+        w->maximize();
+        w->bring_to_front();
+        phone_app_stack.push_back(w);
+    }, false};
+
     using namespace Webxx;
     return fragment{
         dv{{_id{"homescreen"}},
+            each(all_windows, [](Window* w) {
+                if(w->is_hidden()) {
+                    return fragment{};
+                }
+
+                return fragment{
+                    button{{
+                            _dataWindowId{w->id},
+                            _onClick{std::format("handleEvent(this, event, {});", reinterpret_cast<std::uintptr_t>(&on_click))},
+                        },
+                        img{{_src{w->get_icon()}, _alt{w->get_title()}}},
+                        w->get_title()
+                    }
+                };
+            })
         }
     };
 }
@@ -181,6 +226,12 @@ auto ganyu() -> webpp::coroutine<void> {
 int my_main() {
     webpp::log("Hello World!");
 
+    static std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
+    static bool cyndi = hash == "#cyndi";
+    static bool x42054c01 = hash == "#x42054c01";
+    windows::cyndi.set_hidden(!cyndi);
+    windows::x42054c01.set_hidden(!x42054c01);
+
     static bool is_touch = *webpp::eval("window.matchMedia(\"(pointer: coarse)\").matches")["result"].as<bool>();
     static bool is_portrait = *webpp::eval("window.matchMedia(\"(orientation: portrait)\").matches")["result"].as<bool>();
     static bool phone_mode = is_touch || is_portrait;
@@ -188,10 +239,6 @@ int my_main() {
     webpp::get_element_by_id("main")->add_class(phone_mode ? "phone" : "desktop");
 
     webpp::get_element_by_id("main")->inner_html(Webxx::render(page()));
-
-    static std::string hash = webpp::eval("window.location.hash")["result"].as<std::string>().value_or("");
-    static bool cyndi = hash == "#cyndi";
-    static bool x42054c01 = hash == "#x42054c01";
 
     Window::setup();
     webpp::coro::submit([]() -> webpp::coroutine<void> {
@@ -213,11 +260,7 @@ int my_main() {
                 }
             });
 
-            if(cyndi) {
-                // TODO
-            } else if(x42054c01) {
-                // TODO
-            } else if(hash.size() > 1) {
+            if(hash.size() > 1 && !cyndi && !x42054c01) {
                 auto fullscreen_window_id = std::string_view{hash}.substr(1); // remove '#' from the beginning
                 for(auto& w : all_windows) {
                     if(w->id == fullscreen_window_id) {
@@ -307,10 +350,7 @@ int my_main() {
 
                 webpp::get_element_by_id("close_message")->inner_html("");
                 for(auto* window : all_windows) {
-                    if(window == &windows::cyndi && !cyndi) {
-                        continue;
-                    }
-                    if(window == &windows::x42054c01 && !x42054c01) {
+                    if(window->is_hidden()) {
                         continue;
                     }
                     window->open();
