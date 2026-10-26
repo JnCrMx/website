@@ -135,9 +135,9 @@ auto page() {
         dv{{_id{"close_message"}}},
         render_homescreen(),
         dv{{_id{"navigation_bar"}},
-            button{{_id{"nav_overview"}}},
-            button{{_id{"nav_home"}}},
-            button{{_id{"nav_close"}}},
+            button{{_id{"nav_overview"}, _style{"background-image: url('images/nav_overview.png')"}}},
+            button{{_id{"nav_home"},     _style{"background-image: url('images/nav_home.png')"}}},
+            button{{_id{"nav_close"},    _style{"background-image: url('images/nav_close.png')"}}},
         }
     };
 }

@@ -311,6 +311,10 @@ ul.licenses {
     height: 100%;
     border: none;
     background: none;
+
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 #main.desktop #homescreen {
