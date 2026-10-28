@@ -9,7 +9,7 @@
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="nav_home.svg"
-   inkscape:export-filename="buttons.png"
+   inkscape:export-filename="nav_home.png"
    inkscape:export-xdpi="64"
    inkscape:export-ydpi="64"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -44,8 +44,8 @@
      transform="translate(-53.840919,-38.21318)">
     <path
        id="rect1"
-       style="fill:none;stroke:#c5c4c5;stroke-width:4.23333333;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
-       d="m 79.240918,43.027868 c 2.656594,0 18.520835,14.337437 18.520835,16.828956 v 22.225001 c 0,1.172633 -0.944033,2.116667 -2.116667,2.116667 H 62.836751 c -1.172633,0 -2.116666,-0.944034 -2.116666,-2.116667 v -22.225 c 0,-3.059573 15.864239,-16.828956 18.520833,-16.828957 z"
+       style="fill:none;stroke:#c5c4c5;stroke-width:3.70416667;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+       d="m 79.240918,45.207698 c 2.375281,0 16.559618,12.81921 16.559618,15.046896 v 19.87154 c 0,1.04846 -0.844067,1.892528 -1.892528,1.892528 H 64.573829 c -1.04846,0 -1.892527,-0.844068 -1.892527,-1.892528 V 60.254595 c 0,-2.735587 14.184335,-15.046896 16.559616,-15.046897 z"
        sodipodi:nodetypes="zssssssz" />
   </g>
 </svg>
