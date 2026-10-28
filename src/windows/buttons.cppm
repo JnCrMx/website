@@ -115,7 +115,7 @@ namespace windows {
                     "Overall, please just be nice and cute :3"
                 },
             },
-            h4{"Buttons of cool people/robots/other beings :3"},
+            h4{"Buttons of cool people/robots/other beings and cool projects/things :3"},
             p{i{"If you encounter any outdated buttons or alt texts, please let me know via ", a{{_href{"#feedback"}, _target{"blank"}}, "Feedback"}}, " so I can fix it. :3"},
             p{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
                 each(button_datas, b88x31d)
