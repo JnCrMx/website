@@ -14,6 +14,7 @@ namespace windows {
         std::string_view alt;
         std::string_view target;
         bool large;
+        std::string_view license;
     };
     constexpr static char buttons_tsv[] = {
         #embed "buttons.tsv"
@@ -41,6 +42,7 @@ namespace windows {
             e.target    = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(1)).begin()};
             std::string_view large{*(lv | std::views::split("\t"sv) | std::views::drop(4)).begin()};
             e.large     = large == "true";
+            e.license   = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(5)).begin()};
 
             if(e.name.empty()) {
                 constexpr_throw("\"name\" must not be empty");
@@ -72,19 +74,22 @@ namespace windows {
         return array;
     }();
 
-    constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true) {
-        return a{{_href{target}, _target{"_blank"}},
-            img{{
-                _src{std::format("buttons/{}", name)},
-                _alt{alt},
-                _width{"88"},
-                _height{"31"},
-                _class{large ? "button-large" : "button-normal"}
-            }}
+    constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true, std::string_view license = "") {
+        return dv{{_class{"button-container"}},
+                a{{_href{target}, _target{"_blank"}},
+                img{{
+                    _src{std::format("buttons/{}", name)},
+                    _alt{alt},
+                    _width{"88"},
+                    _height{"31"},
+                    _class{large ? "button-large" : "button-normal"}
+                }}
+            },
+            dv{{_class{"button-license"}}, license},
         };
     }
     constexpr auto b88x31d(const button_data& data) {
-        return b88x31(data.name, data.alt, data.target, data.large);
+        return b88x31(data.name, data.alt, data.target, data.large, data.license);
     }
 
     export Window buttons{"buttons", "Buttons", "images/buttons.png", [](){
@@ -92,7 +97,7 @@ namespace windows {
             dv{
                 "I have a (for now badly made) 88x31 button! :D" "<br>",
                 "My website is reachable under different names (hence two buttons), so pick whichever you prefer ;3",
-                p{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
+                dv{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
                     b88x31("jcm.pet.png", "jcm.pet", "https://jcm.pet"),
                     b88x31("jcm.re.png", "jcm.re", "https://jcm.re"),
                 },
@@ -117,7 +122,7 @@ namespace windows {
             },
             h4{"Buttons of cool people/robots/other beings and cool projects/things :3"},
             p{i{"If you encounter any outdated buttons or alt texts, please let me know via ", a{{_href{"#feedback"}, _target{"blank"}}, "Feedback"}}, " so I can fix it. :3"},
-            p{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
+            dv{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
                 each(button_datas, b88x31d)
             },
         };

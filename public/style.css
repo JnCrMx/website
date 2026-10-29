@@ -259,6 +259,22 @@ ul.licenses {
     display: block;
 }
 
+.button-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 1em;
+}
+
+.button-license {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    font-size: 1em;
+    text-wrap: nowrap;
+    overflow-x: scroll;
+}
+
 /* Shamelessly stolen from a cute bot: https://www.5snb.club/w/88x31-tips/ */
 .button-large {
     image-rendering: pixelated;
