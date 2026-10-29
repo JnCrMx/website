@@ -15,7 +15,7 @@ namespace windows {
                     input{{_type{"submit"}, _name{"subject"}, _value{"bully 😈"}}},
                 },
                 hr{},
-                textarea{{_style{"width: 100%; margin-top: 5px;"}, _name{"message"}, _rows{"5"}, _placeholder{"Type your praise/critique/bullying here! (optional)"}}},
+                textarea{{_style{"width: 100%; margin-top: 5px;"}, _name{"message"}, _rows{"5"}, _placeholder{"Type your praise/critique/bullying here! (optional, but will make me very happy)"}}},
             }
         };
     }};
