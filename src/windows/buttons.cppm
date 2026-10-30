@@ -14,7 +14,7 @@ namespace windows {
         std::string_view alt;
         std::string_view target;
         bool large;
-        std::string_view license;
+        std::string_view attribution;
     };
     constexpr static char buttons_tsv[] = {
         #embed "buttons.tsv"
@@ -37,12 +37,12 @@ namespace windows {
             auto& e = array[i];
             std::string_view lv{l};
 
-            e.name      = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(0)).begin()};
-            e.alt       = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(3)).begin()};
-            e.target    = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(1)).begin()};
+            e.name          = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(0)).begin()};
+            e.alt           = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(3)).begin()};
+            e.target        = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(1)).begin()};
             std::string_view large{*(lv | std::views::split("\t"sv) | std::views::drop(4)).begin()};
-            e.large     = large == "true";
-            e.license   = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(5)).begin()};
+            e.large         = large == "true";
+            e.attribution   = std::string_view{*(lv | std::views::split("\t"sv) | std::views::drop(5)).begin()};
 
             if(e.name.empty()) {
                 constexpr_throw("\"name\" must not be empty");
@@ -74,7 +74,7 @@ namespace windows {
         return array;
     }();
 
-    constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true, std::string_view license = "") {
+    constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true, std::string_view attribution = "") {
         return dv{{_class{"button-container"}},
                 a{{_href{target}, _target{"_blank"}},
                 img{{
@@ -85,11 +85,11 @@ namespace windows {
                     _class{large ? "button-large" : "button-normal"}
                 }}
             },
-            dv{{_class{"button-license"}}, license},
+            dv{{_class{"button-attribution"}}, attribution},
         };
     }
     constexpr auto b88x31d(const button_data& data) {
-        return b88x31(data.name, data.alt, data.target, data.large, data.license);
+        return b88x31(data.name, data.alt, data.target, data.large, data.attribution);
     }
 
     export Window buttons{"buttons", "Buttons", "images/buttons.png", [](){

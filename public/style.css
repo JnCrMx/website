@@ -265,8 +265,11 @@ ul.licenses {
     position: relative;
     padding-bottom: 1em;
 }
+.button-container:has(.button-attribution:empty) {
+    padding-bottom: 0em;
+}
 
-.button-license {
+.button-attribution {
     position: absolute;
     bottom: 0px;
     width: 100%;

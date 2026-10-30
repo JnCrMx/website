@@ -1,6 +1,6 @@
-name	target	url	alt	large	license
-5snb.png	https://www.5snb.club/	https://www.5snb.club/img/buttons/4fbb09-button.png	[4fbb09]	true	CC BY-NC-ND 4.0 by 5225225
+name	target	url	alt	large	attribution
+5snb.png	https://www.5snb.club/	https://www.5snb.club/img/buttons/4fbb09-button.png	[4fbb09]	true	CC BY-NC-ND 4.0 by <a href="https://www.5snb.club/" target="_blank">5225225</a>
 #mldkyt.gif	https://www.mldkyt.com/	https://mldkyt.com/button.gif	mldkyt	true
-spikiii.png	https://spikiii.nekoweb.org/	https://spikiii.nekoweb.org/images/88x31_buttons/spikiii.png	A pixel-art 88x31 button for spikiii.nekoweb.org! It depicts Pashe (an anthro sheep woman; Spikiii's fursona) holding a giant pencil and standing next to the name of the site, which is rendered in big yellow and red letters.	true	with permission from Spikiii
-gnujump.gif	http://jump.gnu.sinusoid.es/	https://mkljczk.pl/88x31/gnujump_88x31.gif	GNUjump Now!	true	??? by nicole mikołajczyk
-vscodium.gif	https://pleroma.envs.net/notice/AjuH9eQTTr0PfLUHgG	https://m.pleroma.envs.net/media/3eae1ec30f5d5beb67672c48bf3975ebaeb47ad862a3d0c639399b22a5c7a80b.gif	Made with VSCodium	true	CC-BY-SA-NC by Daudix
+spikiii.png	https://spikiii.nekoweb.org/	https://spikiii.nekoweb.org/images/88x31_buttons/spikiii.png	A pixel-art 88x31 button for spikiii.nekoweb.org! It depicts Pashe (an anthro sheep woman; Spikiii's fursona) holding a giant pencil and standing next to the name of the site, which is rendered in big yellow and red letters.	true	with permission from <a href="https://spikiii.nekoweb.org/" target="_blank">Spikiii</a>
+gnujump.gif	http://jump.gnu.sinusoid.es/	https://mkljczk.pl/88x31/gnujump_88x31.gif	GNUjump Now!	true	by <a href="https://mkljczk.pl/" target="_blank">nicole mikołajczyk</a>
+vscodium.gif	https://vscodium.com/	https://m.pleroma.envs.net/media/3eae1ec30f5d5beb67672c48bf3975ebaeb47ad862a3d0c639399b22a5c7a80b.gif	Made with VSCodium	true	CC-BY-SA-NC by <a href="https://daudix.one/" target="_blank">Daudix</a>
