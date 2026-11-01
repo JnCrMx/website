@@ -308,6 +308,15 @@ ul.licenses {
     height: calc(100% - 4em);
     max-height: calc(100% - 4em);
 }
+#main.phone details {
+    margin: 5px;
+}
+#main.phone details summary {
+    border-radius: 9px;
+    padding: 5px;
+    border: 1px solid #444;
+    background-color: #EEE;
+}
 
 #main.phone #navigation_bar {
     display: flex;
