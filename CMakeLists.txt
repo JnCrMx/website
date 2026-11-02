@@ -31,7 +31,7 @@ FetchContent_Declare(webxx
 )
 FetchCOntent_Declare(tinyxml2
     GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
-    GIT_TAG v10.0.0)
+    GIT_TAG 11.0.0)
 
 set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(webpp_BUILD_STD_MODULE OFF CACHE BOOL "" FORCE)
