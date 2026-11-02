@@ -176,6 +176,7 @@ ul.licenses {
 
 .project-header {
     white-space: nowrap;
+    line-height: 1.75;
 }
 
 .project-links {
@@ -192,7 +193,6 @@ ul.licenses {
 
 .project-tags {
     display: inline;
-    margin-left: 0.5em;
     vertical-align: text-top;
 }
 .project-tags a {

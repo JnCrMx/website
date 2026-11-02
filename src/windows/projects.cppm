@@ -70,8 +70,10 @@ namespace windows {
                     li{
                         p{
                             h4{{_class{"project-header"}},
-                                a{{_href{url}, _target{"_blank"}}, name},
-                                dv{{_class{"project-links"}}, each<ProjectLink>(std::move(links))},
+                                dv{
+                                    a{{_href{url}, _target{"_blank"}}, name},
+                                    dv{{_class{"project-links"}}, each<ProjectLink>(std::move(links))}
+                                },
                                 dv{{_class{"project-tags"}}, each<ProjectTag>(std::move(tags))},
                             },
                             content
