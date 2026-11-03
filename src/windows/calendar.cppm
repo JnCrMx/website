@@ -21,6 +21,17 @@ namespace windows {
             submit([]()->coroutine<void> {
                 std::string cal = co_await fetch("https://cal.jcm.re/jcm/public").then(std::mem_fn(&webpp::response::co_text));
 
+                std::chrono::year_month_day now{};
+                {
+                    auto now_string = webpp::eval("(new Date()).toISOString()")["result"].as<std::string>().value_or("0000-00-00");
+                    std::string_view date = now_string;
+                    int year = std::stoi(std::string{date.substr(0, 4)});
+                    int month = std::stoi(std::string{date.substr(5, 2)});
+                    int day = std::stoi(std::string{date.substr(8, 2)});
+                    now = std::chrono::year_month_day{std::chrono::year(year), std::chrono::month(month), std::chrono::day(day)};
+                    webpp::log("Today is {} (JS said {}).", now, now_string);
+                }
+
                 struct simple_event {
                     std::chrono::year_month_day begin{}, end{};
                     std::string summary, location, url, description;
@@ -87,7 +98,9 @@ namespace windows {
 
                 for(auto e : events) {
                     using namespace Webxx;
-                    auto element = webpp::create_element_from_html(render(li{
+                    std::string_view style = (e.end < now ? "color: gray;" : e.begin <= now ? "font-weight: bold; font-size: 1.2em;" : "");
+
+                    auto element = webpp::create_element_from_html(render(li{{_style{style}},
                         (e.begin == e.end ?
                             fragment{
                                 std::format("{}", e.begin)
