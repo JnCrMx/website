@@ -49,8 +49,9 @@ target_compile_features(tinyxml2Module PUBLIC cxx_std_26)
 target_link_libraries(tinyxml2Module PUBLIC tinyxml2::tinyxml2)
 
 add_library(stdModule STATIC)
-target_sources(stdModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS /usr/lib/llvm-20/share/libc++/v1/
-    FILES /usr/lib/llvm-20/share/libc++/v1/std.cppm)
+file(REAL_PATH /usr/include/c++/v1/../../../share/libc++/v1/ STD_DIR)
+message(STATUS "libc++ modules are hopefully in ${STD_DIR}")
+target_sources(stdModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${STD_DIR} FILES ${STD_DIR}/std.cppm)
 target_compile_features(stdModule PUBLIC cxx_std_26)
 # The standard library may use reserved identifiers
 target_compile_options(stdModule PRIVATE -Wno-reserved-identifier)
@@ -85,7 +86,7 @@ target_sources(website PUBLIC FILE_SET CXX_MODULES BASE_DIRS src FILES ${MODULE_
 target_compile_features(website PRIVATE cxx_std_26)
 target_link_options(website PRIVATE -Wl,--no-entry)
 target_link_options(website PRIVATE -nostartfiles)
-target_link_libraries(website PRIVATE stdModule webxxModule tinyxml2Module webpp::webpp)
+target_link_libraries(website PRIVATE webxxModule tinyxml2Module webpp::webpp)
 target_compile_options(website PRIVATE --embed-dir=${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(website PRIVATE -Wno-c23-extensions)
 
