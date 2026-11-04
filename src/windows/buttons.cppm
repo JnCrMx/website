@@ -121,10 +121,11 @@ namespace windows {
                 },
             },
             h4{"Buttons of cool people/robots/other beings and cool projects/things :3"},
-            p{i{"If you encounter any outdated buttons or alt texts, please let me know via ", a{{_href{"#feedback"}, _target{"blank"}}, "Feedback"}}, " so I can fix it. :3"},
+            p{i{"If you encounter any outdated buttons or alt texts, please let me know via ", a{{_href{"#feedback"}, _target{"_blank"}}, "Feedback"}, " so I can fix it. :3"}},
             dv{{_style{"display: flex; flex-wrap: wrap; gap: 8px;"}},
                 each(button_datas, b88x31d)
             },
+            p{small{"Machine-readable list including links original source images: ", a{{_href{"https://git.jcm.re/jcm/website/src/branch/main/src/windows/buttons.tsv?display=source"}, _target{"_blank"}}, code{"buttons.tsv"}}}}
         };
     }};
 }
