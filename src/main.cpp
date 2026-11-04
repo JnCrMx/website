@@ -273,9 +273,9 @@ int my_main() {
                 }
             }
         } else {
+            windows::about_me.open(100, 50);
             windows::buttons.open(120, 400);
             windows::blog.open(400, 450);
-            windows::about_me.open(75, 50);
             windows::calendar.open(600, 150);
             windows::projects.open(800, 100);
             windows::source_code.open(900, 500);
