@@ -34,7 +34,7 @@ namespace windows {
     export Window build_info{"build_info", "Build Info", "images/build_info.png", [](){
         return fragment{
             "Build from commit ",
-            a{{_href{std::format("https://git.jcm.re/jcm/website/commit/{}", files::views::git_commit_hash)}, _target{"blank"}},
+            a{{_href{std::format("https://git.jcm.re/jcm/website/commit/{}", files::views::git_commit_hash)}, _target{"_blank"}},
               code{files::views::git_short_commit_hash}},
             std::format(
                 " on {} at {} with {} version {}.{}.{}.",

@@ -44,16 +44,16 @@ namespace windows {
                 ul{
                     li{"I am running ", a{{_href{"https://wafrn.jcm.re/blog/icepi-zero-bot"}, _target{"_blank"}},
                         "\"the most popular fediverse connected FPGA development platform in the world\""},
-                        sup{a{{_href{"https://mastodon.social/@poleguy/117533687396430100"}, _target{"blank"}}, "[citation]"}},
+                        sup{a{{_href{"https://mastodon.social/@poleguy/117533687396430100"}, _target{"_blank"}}, "[citation]"}},
                     },
                 }
             },
             details{
                 summary{b{"How to contact me"}},
                 ul{
-                    li{"E-Mail: ", a{{_href{"mailto:jcm@jcm.re"}, _target{"blank"}}, "jcm@jcm.re"}},
-                    li{"DM on Fedi: ", a{{_href{"https://wafrn.jcm.re/blog/jcm"}, _target{"blank"}}, "@jcm@wafrn.jcm.re"}},
-                    li{"Matrix: ", a{{_href{"https://matrix.to/#/@jcm:jcm.re"}, _target{"blank"}}, "@jcm:jcm.re"}},
+                    li{"E-Mail: ", a{{_href{"mailto:jcm@jcm.re"}, _target{"_blank"}}, "jcm@jcm.re"}},
+                    li{"DM on Fedi: ", a{{_href{"https://wafrn.jcm.re/blog/jcm"}, _target{"_blank"}}, "@jcm@wafrn.jcm.re"}},
+                    li{"Matrix: ", a{{_href{"https://matrix.to/#/@jcm:jcm.re"}, _target{"_blank"}}, "@jcm:jcm.re"}},
                 }
             },
             p{"P.S.: I love Cyndi~! 🩷🩵"},
