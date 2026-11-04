@@ -258,6 +258,9 @@ ul.licenses {
 #dock button:hover .tooltip {
     display: block;
 }
+#close_message {
+    padding-left: 7.5rem;
+}
 
 .button-container {
     display: flex;
