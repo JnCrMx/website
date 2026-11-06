@@ -12,6 +12,7 @@ namespace windows {
         "meow",
         "woof",
         "beep",
+        "squeak",
     };
 
     export Window meow = [](){
