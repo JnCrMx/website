@@ -65,9 +65,9 @@ auto render_dock() {
                 return fragment{button{{
                         _dataWindowId{w->id},
                         _onClick{std::format("handleEvent(this, event, {});", reinterpret_cast<std::uintptr_t>(&on_click))},
-                        _style{std::format("background-image: url('{}');", w->get_icon())}
+                        _style{std::format("background-image: url('{}'); anchor-name: --dock-{};", w->get_icon(), w->id)}
                     },
-                    dv{{_class{"tooltip"}}, w->get_title()}
+                    dv{{_class{"tooltip"}, _style{std::format("position-anchor: --dock-{}", w->id)}}, w->get_title()}
                 }};
             })
         }
