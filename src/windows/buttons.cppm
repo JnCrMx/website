@@ -53,8 +53,8 @@ namespace windows {
             if(e.alt.empty()) {
                 constexpr_throw("\"alt\" must not be empty for accessibility reasons");
             }
-            if(!e.target.starts_with("http://") && !e.target.starts_with("https://")) {
-                constexpr_throw("\"url\" must start with either \"https://\" or \"http://\"");
+            if(!e.target.starts_with("http://") && !e.target.starts_with("https://") && !e.target.empty()) {
+                constexpr_throw("\"url\" must be empty or start with either \"https://\" or \"http://\"");
             }
             if(large != "true" && large != "false") {
                 constexpr_throw("\"friend\"/\"large\" must be either \"true\" or \"false\"");
@@ -75,16 +75,16 @@ namespace windows {
     }();
 
     constexpr auto b88x31(std::string_view name, std::string_view alt, std::string_view target, bool large = true, std::string_view attribution = "") {
-        return dv{{_class{"button-container"}},
-                a{{_href{target}, _target{"_blank"}},
-                img{{
+        auto image = img{{
                     _src{std::format("buttons/{}", name)},
                     _alt{alt},
                     _width{"88"},
                     _height{"31"},
                     _class{large ? "button-large" : "button-normal"}
-                }}
-            },
+                }};
+        auto link = target.empty() ? a{std::move(image)} : a{{_href{target}, _target{"_blank"}}, std::move(image)};
+        return dv{{_class{"button-container"}},
+            std::move(link),
             dv{{_class{"button-attribution"}}, attribution},
         };
     }
