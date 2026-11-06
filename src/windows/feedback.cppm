@@ -8,7 +8,7 @@ namespace windows {
 
     export Window feedback{"feedback", "Feedback", "images/feedback.png", [](){
         return fragment{
-            form{{_action{"https://mail.jcm.re/form"}, _method{"post"}},
+            form{{_action{"https://mail.jcm.re/form"}, _method{"post"}, _target{"_blank"}},
                 dv{
                     input{{_type{"submit"}, _name{"subject"}, _value{"praise 😊"}}},
                     input{{_type{"submit"}, _name{"subject"}, _value{"criticize 😡"}}},
