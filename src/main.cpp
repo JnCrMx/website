@@ -25,6 +25,7 @@ static std::array all_windows = {
     &windows::cyndi,
     &windows::feedback,
     &windows::x42054c01,
+    &windows::meow,
 };
 static std::deque<Window*> phone_app_stack;
 
@@ -283,6 +284,7 @@ int my_main() {
             windows::build_info.open(900, 850);
             //windows::c_interpreter.open(400, 100);
             windows::feedback.open(100, 650);
+            windows::meow.open(1250, 250);
 
             if(cyndi) {
                 windows::cyndi.open(500, 250);

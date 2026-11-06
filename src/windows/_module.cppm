@@ -12,3 +12,4 @@ export import :c_interpreter;
 export import :cyndi;
 export import :feedback;
 export import :x42054c01;
+export import :meow;
