@@ -16,6 +16,9 @@ namespace windows {
         "waf",
         "yip",
         "eepeep",
+        "*pat*",
+        "*boop*",
+        "*scratch*",
     };
 
     export Window meow = [](){
