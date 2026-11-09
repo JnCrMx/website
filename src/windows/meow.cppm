@@ -15,6 +15,7 @@ namespace windows {
         "squeak",
         "waf",
         "yip",
+        "eepeep",
     };
 
     export Window meow = [](){
@@ -44,7 +45,7 @@ namespace windows {
             struct state {
                 int touch_start{};
             };
-            auto s = std::make_shared<state>();
+            auto s = std::make_shared<state>(); // we are leaking here I think >_<
             button.add_event_listener("contextmenu", [](webpp::event e){
                 e.prevent_default();
                 e.stop_propagation();
