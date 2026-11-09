@@ -76,7 +76,8 @@ namespace windows {
                     return;
                 }
                 e.prevent_default();
-                // TODO: show context menu
+
+                webpp::eval("document.getElementById(\"meow_select\").showPicker()");
             });
         };
 
