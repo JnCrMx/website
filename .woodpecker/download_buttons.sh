@@ -7,6 +7,10 @@ tail -n+2 src/windows/buttons.tsv | while read line; do
         continue
     fi
     url="$(echo "$line" | cut -f3)"
+    if [[ "$url" == "<local>" ]]; then
+        echo "Skipping $name (is local file)"
+        continue
+    fi
 
     echo "$url -> public/buttons/$name"
     curl -m10 -L -sS -f -A "JCM's CI script <jcm@jcm.re>" -o "public/buttons/$name" "$url"
