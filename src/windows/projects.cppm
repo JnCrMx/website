@@ -62,10 +62,10 @@ namespace windows {
         };
 
         struct Project : public component<Project> {
-            Project(const std::string& name, const std::string& url, std::list<ProjectLink>&& links, std::list<std::string_view>&& tags, const std::string& description) :
+            Project(std::string_view name, std::string_view url, std::list<ProjectLink>&& links, std::list<std::string_view>&& tags, std::string_view description) :
                 Project(name, url, std::move(links), std::move(tags), fragment{description}) {}
 
-            Project(const std::string& name, const std::string& url, std::list<ProjectLink>&& links, std::list<std::string_view>&& tags, fragment content) :
+            Project(std::string_view name, std::string_view url, std::list<ProjectLink>&& links, std::list<std::string_view>&& tags, fragment content) :
                 component<Project> {
                     li{
                         p{
